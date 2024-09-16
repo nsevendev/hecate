@@ -1,0 +1,51 @@
+services:
+  rust-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        RUST_VERSION: ${RUST_VERSION}
+        PORT_DOCKER_INIT_PROJECT: ${PORT_DOCKER_INIT_PROJECT}
+      target: dev
+    container_name: ${NAME_CONTAINER_DEV}
+    volumes:
+      - .:/app
+    ports:
+      - "${PORT_DOCKER_INIT_PROJECT}:${PORT_DOCKER_INIT_PROJECT}"
+    env_file: ".env.dev.local"
+    command: cargo watch -x run
+
+  rust-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        RUST_VERSION: ${RUST_VERSION}
+        PORT_DOCKER_INIT_PROJECT: ${PORT_DOCKER_INIT_PROJECT}
+      target: test
+    container_name: ${NAME_CONTAINER_TEST}
+    command: cargo watch -x test
+
+  rust-clippy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        RUST_VERSION: ${RUST_VERSION}
+        PORT_DOCKER_INIT_PROJECT: ${PORT_DOCKER_INIT_PROJECT}
+      target: clippy
+    container_name: ${NAME_CONTAINER_LINT}
+    command: cargo watch -x clippy
+
+  rust-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        RUST_VERSION: ${RUST_VERSION}
+        PORT_DOCKER_INIT_PROJECT: ${PORT_DOCKER_INIT_PROJECT}
+      target: production
+    container_name: ${NAME_CONTAINER_PROD}
+    ports:
+      - "8000:8000"
+    restart: always
