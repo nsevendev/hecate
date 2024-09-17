@@ -1,29 +1,37 @@
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
-use serde::Serialize;
+use actix_web::{App, HttpServer};
 
-#[derive(Serialize)]
-struct MyResponse {
-    status: u32,
-    value: String,
-}
+// lib hecate
+use hecate_lib::application::ping::ping_route;
+use hecate_lib::domaine::ping::ping_schema::Ping;
 
-#[get("/")]
-async fn hello_world() -> impl Responder {
-    let response = MyResponse {
-        status: 200,
-        value: String::from("hello world"),
-    };
+use tracing::info;
+use tracing_subscriber;
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
-    HttpResponse::Ok().json(response)
-}
+#[derive(OpenApi)]
+#[openapi(paths(ping_route::test), components(schemas(Ping)))]
+struct ApiDoc;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    tracing_subscriber::fmt::init();
+
+    let openapi = ApiDoc::openapi();
+
+    // log pour le schema json de openapi doc
+    //let openapi_json = serde_json::to_string_pretty(&openapi).expect("Failed to serialize OpenAPI");
+    //tracing::info!("OpenAPI generated: {}", openapi_json);
+
+    info!("Starting server");
+    HttpServer::new(move || {
         App::new()
-            .service(hello_world)
+            .service(
+                SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
+            )
+            .service(ping_route::test)
     })
-    .bind(("0.0.0.0", 6000))?
+    .bind(("0.0.0.0", 8000))?
     .run()
     .await
 }
