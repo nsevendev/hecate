@@ -1,7 +1,7 @@
 import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { PingRepository } from '../infra/ping.repository'
 import { CreatePingDto } from './create-ping.dto'
-import { BaseService } from '../../shared/base.service'
+import { BaseService } from '../../shared/base-service/base.service'
 
 @Injectable()
 export class PingService extends BaseService {
