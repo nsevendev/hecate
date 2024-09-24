@@ -3,7 +3,7 @@ import { PingService } from './ping.service'
 import { CreatePingDto } from './create-ping.dto'
 import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Ping } from '../domaine/ping.entity'
-import { HttpExceptionResponse } from 'src/shared/exception-response/http-exception-response'
+import { HttpExceptionResponse } from '../../shared/exception-response/http-exception-response'
 
 @ApiTags('Ping Controller')
 @Controller('ping')

@@ -1,7 +1,7 @@
 import { CreatePingDto } from 'src/ping/app/create-ping.dto'
 import { PingService } from 'src/ping/app/ping.service'
 import { PingRepository } from 'src/ping/infra/ping.repository'
-import { BaseService } from 'src/shared/base.service'
+import { BaseService } from 'src/shared/base-service/base.service'
 
 export class PingSeed extends BaseService {
     constructor(
