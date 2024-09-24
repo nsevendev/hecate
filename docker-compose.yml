@@ -28,13 +28,13 @@ services:
         ports:
             - '${POSTGRES_PORT}:${POSTGRES_PORT}'
         volumes:
-            - postgres_data:/var/lib/postgresql/data
+            - hecate_postgres_data:/var/lib/postgresql/data
             - ./scripts/init-db-test.sh:/docker-entrypoint-initdb.d/init-db-test.sh:ro
         networks:
             - hecate-network
 
 volumes:
-    postgres_data:
+    hecate_postgres_data:
 
 networks:
     hecate-network:
