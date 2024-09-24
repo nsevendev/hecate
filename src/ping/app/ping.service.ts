@@ -1,14 +1,11 @@
-import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common'
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
 import { PingRepository } from '../infra/ping.repository'
 import { CreatePingDto } from './create-ping.dto'
 import { BaseService } from '../../shared/base-service/base.service'
 
 @Injectable()
 export class PingService extends BaseService {
-    constructor(
-        @Inject('PING_REPOSITORY')
-        private readonly pingRepository: PingRepository
-    ) {
+    constructor(private readonly pingRepository: PingRepository) {
         super('PingService')
     }
 
@@ -29,7 +26,7 @@ export class PingService extends BaseService {
             throw new ConflictException('Impossible de creer le ping, Un ping existe déjà')
         }
 
-        const newPing = this.pingRepository.create(createPingDto)
-        return await this.pingRepository.save(newPing)
+        const newPing = this.pingRepository.repository.create(createPingDto)
+        return await this.pingRepository.repository.save(newPing)
     }
 }

@@ -9,9 +9,11 @@ import { TypeOrmModule } from '@nestjs/typeorm'
             imports: [ConfigModule], // Pour accéder aux variables d'environnement
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => ({
+                logging: configService.get<string>('SYNC_DATABASE') === 'true', // log if sync is true (for dev)
                 type: 'postgres',
                 url: configService.get<string>('DATABASE_URL'), // Utilisation de DATABASE_URL
                 entities: [__dirname + '/../**/*.entity{.ts,.js}'], // Chargement des entités
+                autoLoadEntities: true, // Chargement automatique des entités
                 synchronize: configService.get<string>('SYNC_DATABASE') === 'true', // Synchronisation conditionnelle
             }),
         }),
