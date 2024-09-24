@@ -5,6 +5,7 @@ ARG CADDY_VERSION=2.7.6
 FROM node:${NODE_VERSION} AS deps
 RUN apt-get update && apt-get install -y procps
 RUN npm i -g @nestjs/cli
+RUN npm i -g typeorm
 USER node
 WORKDIR /app
 COPY --chown=node:node package*.json ./
