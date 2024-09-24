@@ -23,14 +23,7 @@ describe('PingModule', () => {
                 TypeOrmModule.forFeature([Ping]),
             ],
             controllers: [PingController],
-            providers: [
-                PingService,
-                {
-                    provide: 'PING_REPOSITORY',
-                    useFactory: (dataSource: DataSource) => new PingRepository(dataSource),
-                    inject: [DataSource],
-                },
-            ],
+            providers: [PingService, PingRepository],
         }).compile()
 
         createPingDto = { status: 200, value: 'value' }
