@@ -2,8 +2,13 @@
 
 ## Prérequis
 
+-   cloner le projet
 -   Copier le fichier `.env.public` en `.env.dev.local` et remplir les variables d'environnement  
     demander à un membre de l'équipe pour les valeurs à mettre
+
+- SUR WINDOWS
+
+    - recreer à la main tous les fichiers du dossier scripts
 
 ## utilisation des containers (sans maker)
 
