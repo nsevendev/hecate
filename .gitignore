@@ -56,5 +56,5 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 *.local
-srcrips/init-db-test.sh
-srcrips/install-deps.sh
+scripts/init-db-test.sh
+scripts/install-deps.sh
