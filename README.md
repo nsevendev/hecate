@@ -5,7 +5,7 @@
 -   cloner le projet
 -   Copier le fichier `.env.public` en `.env.dev.local` et remplir les variables d'environnement  
     demander à un membre de l'équipe pour les valeurs à mettre
-- creer les fichiers `init-db-test.sh` et `install-deps.sh`
+- creer les fichiers `init-db-test.sh` et `install-deps.sh` dans le dossier `scripts`
 
 ## Code `init-db-test.sh`
 
