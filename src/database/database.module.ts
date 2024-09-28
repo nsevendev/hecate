@@ -13,6 +13,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
                 type: 'postgres',
                 url: configService.get<string>('DATABASE_URL'), // Utilisation de DATABASE_URL
                 entities: [__dirname + '/../**/*.entity{.ts,.js}'], // Chargement des entités
+                migrations: [__dirname + '/../migrations/*{.ts,.js}'], // Chargement des migrations
                 autoLoadEntities: true, // Chargement automatique des entités
                 synchronize: configService.get<string>('SYNC_DATABASE') === 'true', // Synchronisation conditionnelle
             }),
