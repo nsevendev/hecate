@@ -64,6 +64,24 @@ test-vw: ## Exécuter les tests en mode watch + verbose (jest --watch --verbose)
 	@echo "Exécution des tests en mode watch + verbose dans le conteneur..."
 	$(DOCKER_EXEC) "npm run test:vw"
 
+.PHONY: migration-g
+
+migration-g: ## Creer une migration
+	@echo "Creation d'une migration"
+	$(DOCKER_EXEC) "FILENAME=$(FILENAME) npm run migration:generate"
+
+.PHONY: migation-r
+
+migration-r: ## Executer les migrations
+	@echo "Execution des migrations"
+	$(DOCKER_EXEC) "npm run migration:run"
+
+.PHONY: migration-rev
+
+migration-rev: ## Annuler la dernière migration
+	@echo "Annulation de la dernière migration"
+	$(DOCKER_EXEC) "npm run migration:reverse"
+
 .PHONY: seed
 
 seed: ## Executer les fixtures
