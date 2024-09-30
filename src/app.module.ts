@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config'
 import { DatabaseModule } from './database/database.module'
 import { DatabaseTestModule } from './database-test/database-test.module'
 import { ImageModule } from './image/image.module'
+import { TechnoModule } from './techno/techno.module';
 
 @Module({
     imports: [
@@ -12,6 +13,7 @@ import { ImageModule } from './image/image.module'
         DatabaseTestModule,
         PingModule,
         ImageModule,
+        TechnoModule,
     ],
     controllers: [],
     providers: [],
