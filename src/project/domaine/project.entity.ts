@@ -20,12 +20,11 @@ export class Project {
     @OneToMany(() => Project_techno, (project_techno) => project_techno.project_id, {
         cascade: true
     })
+    technos_id: Project_techno[]
 
     @OneToMany(() => Project_image, (project_image) => project_image.project_id, {
         cascade: true
     })
+    images_id: Project_image
 
-    @JoinTable()
-    technos: Project_techno[]
-    images: Project_image[]
 }

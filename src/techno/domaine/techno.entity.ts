@@ -12,8 +12,6 @@ export class Techno {
     @ApiProperty({ description: 'Nom de la techno' })
     name: string
 
-    @OneToMany(() => Project_techno, (project_techno) => project_techno.techno_id)
-
-    @JoinTable()
-    projects: Project_techno[]
+    @OneToMany(() => Project_techno, (project_techno) => project_techno.technos_id)
+    project_id: Project_techno[]
 }

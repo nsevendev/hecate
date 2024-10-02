@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, JoinColumn, JoinTable, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
 import { Project } from 'src/project/domaine/project.entity'
 import { Image } from 'src/image/domaine/image.entity'
@@ -9,22 +9,19 @@ export class Project_image {
     @ApiProperty({description: "id de project_image" })
     id: number
 
-    @Column()
-    @ApiProperty({ description: "id de l'image' associée" })
-    image_id: number
-
-    @Column()
-    @ApiProperty({ description: "id du projet associé" })
-    project_id: number
-
-    @ManyToOne(() => Project, (project) => project.images, {
+    @ManyToOne(() => Project, (project) => project.images_id, {
         onDelete: 'CASCADE',
     })
-
-    @ManyToOne(() => Image, (image) => image.projects, {
+    @JoinColumn({ name: "project_id" })
+    @ApiProperty({ description: "id du projet associé" })
+    image_id : Image
+    
+    
+    @OneToOne(() => Image, (image) => image.project_id, {
         onDelete: 'CASCADE'
     })
+    @JoinColumn({ name: "image_id" })
+    @ApiProperty({ description: "id de l'image' associée" })
+    project_id: Project
 
-    project: Project
-    image : Image
 }
