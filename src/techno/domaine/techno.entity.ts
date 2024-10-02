@@ -15,5 +15,5 @@ export class Techno {
     @OneToMany(() => Project_techno, (project_techno) => project_techno.techno_id)
 
     @JoinTable()
-    project: Project_techno[]
+    projects: Project_techno[]
 }

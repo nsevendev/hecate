@@ -12,10 +12,7 @@ export class Image {
     @ApiProperty({ description: "Le chemin de l'image, relier à un S3 ou autre" })
     path: string
 
-
-    @OneToMany(() => Project_image, (project_image) => project_image.project_id, {
-        cascade: true
-    })
+    @OneToMany(() => Project_image, (project_image) => project_image.image_id)
 
     @JoinTable()
     projects: Project_image[]

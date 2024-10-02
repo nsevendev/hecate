@@ -21,7 +21,7 @@ export class Project_techno {
         onDelete: 'CASCADE',
     })
 
-    @ManyToOne(() => Techno, (techno) => techno.project, {
+    @ManyToOne(() => Techno, (techno) => techno.projects, {
         onDelete: 'CASCADE'
     })
 
