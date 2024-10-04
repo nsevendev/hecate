@@ -68,7 +68,7 @@ test-vw: ## Exécuter les tests en mode watch + verbose (jest --watch --verbose)
 
 migration-g: ## Creer une migration
 	@echo "Creation d'une migration"
-	$(DOCKER_EXEC) "FILENAME=$(FILENAME) npm run migration:generate"
+	$(DOCKER_EXEC) "npm run migration:generate -- src/migrations/migration"
 
 .PHONY: migation-r
 

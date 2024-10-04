@@ -4,18 +4,18 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 
 @Module({
     imports: [
-        ConfigModule, // Utilisé pour charger les variables d'environnement
+        ConfigModule,
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule], // Pour accéder aux variables d'environnement
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => ({
-                logging: configService.get<string>('SYNC_DATABASE') === 'true', // log if sync is true (for dev)
                 type: 'postgres',
-                url: configService.get<string>('DATABASE_URL'), // Utilisation de DATABASE_URL
-                entities: [__dirname + '/../**/*.entity{.ts,.js}'], // Chargement des entités
-                migrations: [__dirname + '/../migrations/*{.ts,.js}'], // Chargement des migrations
-                autoLoadEntities: true, // Chargement automatique des entités
+                url: configService.get<string>('DATABASE_URL'),
+                entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+                migrations: [__dirname + '/../migrations/*{.ts,.js}'],
+                autoLoadEntities: true,
                 synchronize: configService.get<string>('SYNC_DATABASE') === 'true', // Synchronisation conditionnelle
+                logging: configService.get<string>('SYNC_DATABASE') === 'true',
             }),
         }),
     ],

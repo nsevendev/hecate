@@ -1,6 +1,6 @@
-import { Column, Entity, JoinTable, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
-import { Project_image } from 'src/project_image/domaine/project_image.entity'
+import { ProjectImage } from 'src/project-image/domaine/project-image.entity'
 
 @Entity()
 export class Image {
@@ -12,7 +12,8 @@ export class Image {
     @ApiProperty({ description: "Le chemin de l'image, relier à un S3 ou autre" })
     path: string
 
-    @OneToOne(() => Project_image, (project_image) => project_image.image_id)
-    project_id: Project_image[]
+    @OneToOne(() => ProjectImage, (projectImage) => projectImage.image, {
+        cascade: true,
+    })
+    projectImage: ProjectImage
 }
-
