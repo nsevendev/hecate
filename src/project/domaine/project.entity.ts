@@ -1,6 +1,6 @@
 import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
-import { ProjectImage } from 'src/project-image/domaine/project-image.entity'
+import { ProjectImage } from '../../project-image/domaine/project-image.entity'
 import { Techno } from '../../techno/domaine/techno.entity'
 
 @Entity()

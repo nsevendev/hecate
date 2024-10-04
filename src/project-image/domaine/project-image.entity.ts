@@ -1,7 +1,7 @@
 import { Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
-import { Project } from 'src/project/domaine/project.entity'
-import { Image } from 'src/image/domaine/image.entity'
+import { Project } from '../../project/domaine/project.entity'
+import { Image } from '../../image/domaine/image.entity'
 
 @Entity({ name: 'project_image' })
 export class ProjectImage {

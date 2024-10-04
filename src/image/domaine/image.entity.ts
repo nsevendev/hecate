@@ -1,6 +1,6 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
-import { ProjectImage } from 'src/project-image/domaine/project-image.entity'
+import { ProjectImage } from '../../project-image/domaine/project-image.entity'
 
 @Entity()
 export class Image {
