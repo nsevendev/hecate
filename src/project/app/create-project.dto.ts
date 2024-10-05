@@ -21,12 +21,15 @@ export class CreateProjectDto {
     @ArrayUnique()
     technos: number[]
 
-    // TODO : attention à rectifier le type, car utilisation de Multer, utilise l'implementation auto de nestjs
     @ApiPropertyOptional({
-        description: 'Liste des chemins des images associées au projet',
-        type: [String],
+        description: 'Images du projet',
+        type: 'array',
+        items: {
+            type: 'string',
+            format: 'binary',
+        },
     })
     @IsOptional()
     @IsArray()
-    images?: string[]
+    images?: Express.Multer.File[]
 }

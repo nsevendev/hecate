@@ -20,6 +20,7 @@ describe('ProjectModule', () => {
     let dataSource: DataSource
     let createTechnoDto: CreateTechnoDto
     let createProjectDto: CreateProjectDto
+    let mockFile: (filename: string) => Express.Multer.File
 
     beforeEach(async () => {
         module = await Test.createTestingModule({
@@ -34,8 +35,20 @@ describe('ProjectModule', () => {
         projectRepository = module.get<ProjectRepository>(ProjectRepository)
         technoService = module.get<TechnoService>(TechnoService)
         technoRepository = module.get<TechnoRepository>(TechnoRepository)
-
         createTechnoDto = { name: 'Angular' }
+
+        mockFile = (filename: string): Express.Multer.File => ({
+            fieldname: 'images',
+            originalname: filename,
+            encoding: '7bit',
+            mimetype: 'image/png',
+            buffer: Buffer.from('mocked image content'),
+            size: 1024,
+            destination: 'uploads/',
+            filename,
+            path: `uploads/${filename}`,
+            stream: undefined,
+        })
     })
 
     afterEach(async () => {
@@ -81,6 +94,7 @@ describe('ProjectModule', () => {
             expect(projectCreated.id).toBeDefined()
             expect(projectCreated.name).toBe(createProjectDto.name)
             expect(projectCreated.description).toBe(createProjectDto.description)
+
             // TODO : Vérifier la relation techno
             expect(projectCreated.technos).toHaveLength(1)
             expect(projectCreated.technos[0].id).toBe(techno.id)
@@ -96,15 +110,37 @@ describe('ProjectModule', () => {
             )
         })
 
+        it('ProjectService.createProject avec images', async () => {
+            const techno = await technoService.createTechno(createTechnoDto)
+            createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
+            const files: Express.Multer.File[] = [mockFile('image1.png'), mockFile('image2.jpg')]
+            const projectCreated = await projectService.createProject(createProjectDto, files)
+
+            // TODO : Vérifications propriter project
+            expect(projectCreated.id).toBeDefined()
+            expect(projectCreated.name).toBe(createProjectDto.name)
+            expect(projectCreated.description).toBe(createProjectDto.description)
+
+            // TODO : Vérifier les relations avec les technos
+            expect(projectCreated.technos).toHaveLength(1)
+            expect(projectCreated.technos[0].id).toBe(techno.id)
+            expect(projectCreated.technos[0].name).toBe(createTechnoDto.name)
+
+            // TODO : Vérifier que les images ont été ajoutées
+            expect(projectCreated.projectImage).toHaveLength(2)
+            expect(projectCreated.projectImage[0].image.path).toBe(files[0].path)
+            expect(projectCreated.projectImage[1].image.path).toBe(files[1].path)
+        })
+
         it('ProjectService vérifie que la techno inclut le projets associés', async () => {
             const techno = await technoService.createTechno(createTechnoDto)
             createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
             await projectService.createProject(createProjectDto)
-
             const technos = await technoService.getTechnos()
 
             // TODO : vérifier que la techno a un projet associé
             expect(technos[0].projects).toHaveLength(1)
+
             // TODO : vérifier les propriétés du projet dans techno
             expect(technos[0].projects[0].name).toBe(createProjectDto.name)
         })
@@ -142,9 +178,7 @@ describe('ProjectModule', () => {
             const techno = await technoService.createTechno(createTechnoDto)
             createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
             const projectCreated = await projectService.createProject(createProjectDto)
-
             await projectService.deleteProject(projectCreated.id)
-
             const projects = await projectService.getProjects()
 
             // TODO : vérifier que le projet a été supprimé

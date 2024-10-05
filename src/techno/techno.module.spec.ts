@@ -102,10 +102,8 @@ describe('TechnoModule', () => {
         })
 
         it('TechnoService.deleteTechno supprime une techno et met à jour les projets associés', async () => {
-            // Création d'une techno
             const technoCreated = await technoService.createTechno(createTechnoDto)
 
-            // Création d'un projet associé à la techno
             const createProjectDto = {
                 name: 'my projet',
                 description: 'super projet',

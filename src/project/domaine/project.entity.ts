@@ -22,11 +22,13 @@ export class Project {
         eager: true,
     })
     @JoinTable()
+    @ApiProperty({ description: 'Liste des technos associées au projet' })
     technos: Techno[]
 
     @OneToMany(() => ProjectImage, (projectImage) => projectImage.project, {
         eager: true,
         nullable: true,
     })
+    @ApiProperty({ description: 'Liste des images associées au projet' })
     projectImage?: ProjectImage[]
 }
