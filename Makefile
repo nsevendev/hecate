@@ -24,11 +24,11 @@ up: ## Lancer tous les conteneurs (API + BDD)
 
 up-api: ## Lancer uniquement le conteneur API
 	@echo "Lancement du conteneur API..."
-	$(DOCKER_COMPOSE) up api
+	$(DOCKER_COMPOSE) up api -d
 
 up-db: ## Lancer uniquement le conteneur BDD
 	@echo "Lancement du conteneur de la base de données..."
-	$(DOCKER_COMPOSE) up db
+	$(DOCKER_COMPOSE) up db -d
 
 down: ## Arrêter tous les conteneurs
 	@echo "Arrêt de tous les conteneurs..."
