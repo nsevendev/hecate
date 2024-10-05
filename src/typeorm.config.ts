@@ -1,8 +1,5 @@
 import { DataSource } from 'typeorm'
-import * as dotenv from 'dotenv'
 import * as path from 'path'
-
-dotenv.config()
 
 // config pour les migrations
 export const dataSource = new DataSource({
