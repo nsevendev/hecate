@@ -13,7 +13,7 @@ export class Image {
     path: string
 
     @OneToOne(() => ProjectImage, (projectImage) => projectImage.image, {
-        cascade: true,
+        nullable: true,
     })
-    projectImage: ProjectImage
+    projectImage?: ProjectImage
 }

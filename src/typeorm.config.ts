@@ -4,6 +4,7 @@ import * as path from 'path'
 
 dotenv.config()
 
+// config pour les migrations
 export const dataSource = new DataSource({
     type: 'postgres',
     url: process.env.DATABASE_URL,

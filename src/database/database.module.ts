@@ -14,7 +14,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
                 entities: [__dirname + '/../**/*.entity{.ts,.js}'],
                 migrations: [__dirname + '/../migrations/*{.ts,.js}'],
                 autoLoadEntities: true,
-                synchronize: configService.get<string>('SYNC_DATABASE') === 'true', // Synchronisation conditionnelle
+                //synchronize: configService.get<string>('SYNC_DATABASE') === 'true', // Synchronisation conditionnelle
                 logging: configService.get<string>('SYNC_DATABASE') === 'true',
             }),
         }),

@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
 import { Project } from '../../project/domaine/project.entity'
 
@@ -14,7 +14,7 @@ export class Techno {
 
     @ManyToMany(() => Project, (project) => project.technos, {
         onDelete: 'CASCADE',
+        nullable: true,
     })
-    @JoinTable()
-    projects: Project[]
+    projects?: Project[]
 }
