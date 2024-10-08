@@ -4,7 +4,7 @@ import { createId } from '@paralleldrive/cuid2'
 import { z } from 'zod'
 import * as dotenv from 'dotenv'
 import * as path from 'path'
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env.dev.local') })
 
@@ -70,9 +70,12 @@ export class AwsS3Service {
         })
 
         const result = await this.client.send(deleteObjectCommand)
-        if (result.$metadata.httpStatusCode !== 200) {
-            // console.error(result);
+        if (result.$metadata.httpStatusCode !== 200 && result.$metadata.httpStatusCode !== 204) {
+            console.error(result)
+            throw new BadRequestException('Une erreur est survenue lors de la suppression du fichier sur aws')
         }
+
+        return result
     }
 
     async getFileUrl({ fileKey }: { fileKey: string }) {
