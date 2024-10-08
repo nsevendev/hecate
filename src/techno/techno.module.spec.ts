@@ -4,7 +4,6 @@ import { DatabaseTestModule } from '../database-test/database-test.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Test, TestingModule } from '@nestjs/testing'
 import { CreateTechnoDto } from './app/create-techno.dto'
-import { DataSource } from 'typeorm'
 import { NotFoundException } from '@nestjs/common'
 import { TechnoRepository } from './infra/techno.repository'
 import { TechnoController } from './app/techno.controller'
@@ -14,9 +13,8 @@ describe('TechnoModule', () => {
     let technoService: TechnoService
     let module: TestingModule
     let createTechnoDto: CreateTechnoDto
-    let dataSource: DataSource
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         module = await Test.createTestingModule({
             imports: [
                 DatabaseTestModule, // Utilisation bdd pour les tests
@@ -30,18 +28,6 @@ describe('TechnoModule', () => {
         technoController = module.get<TechnoController>(TechnoController)
 
         createTechnoDto = { name: 'angular' }
-    })
-
-    afterEach(async () => {
-        dataSource = module.get<DataSource>(DataSource)
-        const entities = dataSource.entityMetadatas // Récupère toutes les entités
-
-        for (const entity of entities) {
-            const repository = dataSource.getRepository(entity.name) // Accès au repository
-            await repository.query(`TRUNCATE TABLE "${entity.tableName}" RESTART IDENTITY CASCADE;`) // Vide les tables
-        }
-
-        await dataSource.destroy()
     })
 
     describe('Controller', () => {

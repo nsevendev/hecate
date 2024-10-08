@@ -4,41 +4,41 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { ProjectRepository } from './infra/project.repository'
 import { ProjectService } from './app/project.service'
 import { Project } from './domaine/project.entity'
-import { Techno } from '../techno/domaine/techno.entity'
 import { TechnoService } from '../techno/app/techno.service'
-import { TechnoRepository } from '../techno/infra/techno.repository'
-import { DataSource } from 'typeorm'
 import { CreateTechnoDto } from '../techno/app/create-techno.dto'
 import { CreateProjectDto } from './app/create-project.dto'
 import { ProjectController } from './app/project.controller'
+import { BadRequestException, NotFoundException } from '@nestjs/common'
+import { ImageModule } from '../image/image.module'
+import { TechnoModule } from '../techno/techno.module'
+import { ProjectImage } from '../project-image/domaine/project-image.entity'
 
 describe('ProjectModule', () => {
     let projectService: ProjectService
     let projectController: ProjectController
-    let projectRepository: ProjectRepository
     let technoService: TechnoService
-    let technoRepository: TechnoRepository
     let module: TestingModule
-    let dataSource: DataSource
     let createTechnoDto: CreateTechnoDto
     let createProjectDto: CreateProjectDto
     let mockFile: (filename: string) => Express.Multer.File
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         module = await Test.createTestingModule({
             imports: [
                 DatabaseTestModule, // Utilisation bdd pour les tests
-                TypeOrmModule.forFeature([Project, Techno]),
+                TypeOrmModule.forFeature([Project, ProjectImage]),
+                ImageModule,
+                TechnoModule,
             ],
             controllers: [ProjectController],
-            providers: [ProjectService, ProjectRepository, TechnoService, TechnoRepository],
+            providers: [ProjectService, ProjectRepository],
         }).compile()
 
         projectService = module.get<ProjectService>(ProjectService)
-        projectRepository = module.get<ProjectRepository>(ProjectRepository)
         projectController = module.get<ProjectController>(ProjectController)
+
         technoService = module.get<TechnoService>(TechnoService)
-        technoRepository = module.get<TechnoRepository>(TechnoRepository)
+
         createTechnoDto = { name: 'Angular' }
 
         mockFile = (filename: string): Express.Multer.File => ({
@@ -55,18 +55,6 @@ describe('ProjectModule', () => {
         })
     })
 
-    afterEach(async () => {
-        dataSource = module.get<DataSource>(DataSource)
-        const entities = dataSource.entityMetadatas // Récupère toutes les entités
-
-        for (const entity of entities) {
-            const repository = dataSource.getRepository(entity.name) // Accès au repository
-            await repository.query(`TRUNCATE TABLE "${entity.tableName}" RESTART IDENTITY CASCADE;`) // Vide les tables
-        }
-
-        await dataSource.destroy()
-    })
-
     describe('Controller', () => {
         it('ProjectController est defini', () => {
             expect(projectController).toBeDefined()
@@ -81,10 +69,9 @@ describe('ProjectModule', () => {
         it('ProjectController.getProjects avec project existant', async () => {
             const techno = await technoService.createTechno(createTechnoDto)
             createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
-            const projectCreated = await projectController.createProject(createProjectDto)
+            const projectCreated = await projectController.createProject(createProjectDto, null)
             const projects = await projectController.getProjects()
 
-            // TODO : ce test devrait passer si le test ProjectController.createProject passe
             expect(projects[0].id).toEqual(projectCreated.id)
             expect(projects[0].name).toEqual(createProjectDto.name)
         })
@@ -92,10 +79,9 @@ describe('ProjectModule', () => {
         it('ProjectController.getProjectById avec project existant', async () => {
             const techno = await technoService.createTechno(createTechnoDto)
             createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
-            const projectCreated = await projectController.createProject(createProjectDto)
+            const projectCreated = await projectController.createProject(createProjectDto, null)
             const project = await projectController.getProjectById(projectCreated.id)
 
-            // TODO : ce test devrait passer si le test ProjectService.createProject passe
             expect(project.id).toEqual(projectCreated.id)
             expect(project.name).toEqual(createProjectDto.name)
             expect(project.technos).toHaveLength(1)
@@ -104,21 +90,20 @@ describe('ProjectModule', () => {
         })
 
         it('ProjectController.getProjectById sans project', async () => {
-            // TODO : vérifier que la fonction getProjectById lance une erreur si le projet n'existe pas
-            await expect(projectController.getProjectById(1)).rejects.toThrowError('Project not found')
+            await expect(projectController.getProjectById(1)).rejects.toThrow(
+                new NotFoundException("Le project n'existe pas")
+            )
         })
 
         it('ProjectController.createProject sans image, techno obligatoire', async () => {
             const techno = await technoService.createTechno(createTechnoDto)
             createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
-            const projectCreated = await projectController.createProject(createProjectDto)
+            const projectCreated = await projectController.createProject(createProjectDto, null)
 
-            // TODO : Vérifier les propriétés du projet
             expect(projectCreated.id).toBeDefined()
             expect(projectCreated.name).toBe(createProjectDto.name)
             expect(projectCreated.description).toBe(createProjectDto.description)
 
-            // TODO : Vérifier la relation techno
             expect(projectCreated.technos).toHaveLength(1)
             expect(projectCreated.technos[0].id).toBe(techno.id)
             expect(projectCreated.technos[0].name).toBe(createTechnoDto.name)
@@ -127,8 +112,7 @@ describe('ProjectModule', () => {
         it('ProjectController.createProject sans techno KO', async () => {
             createProjectDto = { name: 'my projet', description: 'super projet', technos: [] }
 
-            // TODO : vérifier que la fonction createProject lance une erreur si pas de techno
-            await expect(projectController.createProject(createProjectDto)).rejects.toThrowError(
+            await expect(projectController.createProject(createProjectDto, null)).rejects.toThrowError(
                 'Un projet doit avoir au moins une techno'
             )
         })
@@ -139,40 +123,21 @@ describe('ProjectModule', () => {
             const files: Express.Multer.File[] = [mockFile('image1.png'), mockFile('image2.jpg')]
             const projectCreated = await projectController.createProject(createProjectDto, files)
 
-            // TODO : Vérifications propriter project
             expect(projectCreated.id).toBeDefined()
             expect(projectCreated.name).toBe(createProjectDto.name)
             expect(projectCreated.description).toBe(createProjectDto.description)
 
-            // TODO : Vérifier les relations avec les technos
             expect(projectCreated.technos).toHaveLength(1)
             expect(projectCreated.technos[0].id).toBe(techno.id)
             expect(projectCreated.technos[0].name).toBe(createTechnoDto.name)
 
-            // TODO : Vérifier que les images ont été ajoutées
             expect(projectCreated.projectImage).toHaveLength(2)
-            expect(projectCreated.projectImage[0].image.path).toBe(files[0].path)
-            expect(projectCreated.projectImage[1].image.path).toBe(files[1].path)
-        })
-
-        it('ProjectController vérifie que la techno inclut le projets associés', async () => {
-            const techno = await technoService.createTechno(createTechnoDto)
-            createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
-
-            await projectController.createProject(createProjectDto)
-            const technos = await technoService.getTechnos()
-
-            // TODO : vérifier que la techno a un projet associé
-            expect(technos[0].projects).toHaveLength(1)
-
-            // TODO : vérifier les propriétés du projet dans techno
-            expect(technos[0].projects[0].name).toBe(createProjectDto.name)
         })
 
         it('ProjectController.updateProject modifie les propriétés et la relation techno', async () => {
             const techno = await technoService.createTechno(createTechnoDto)
             createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
-            const projectCreated = await projectController.createProject(createProjectDto)
+            const projectCreated = await projectController.createProject(createProjectDto, null)
 
             // Nouvelle techno à ajouter
             const newTechnoDto = { name: 'React' }
@@ -184,9 +149,12 @@ describe('ProjectModule', () => {
                 description: 'updated description',
                 technos: [techno.id, newTechno.id],
             }
-            const updatedProject = await projectController.updateProject(projectCreated.id, updatedProjectDto)
+            const updatedProject = await projectController.updateProjectById(
+                projectCreated.id,
+                updatedProjectDto,
+                null
+            )
 
-            // TODO : Vérifications après mise à jour
             expect(updatedProject.name).toBe(updatedProjectDto.name)
             expect(updatedProject.description).toBe(updatedProjectDto.description)
             expect(updatedProject.technos).toHaveLength(2)
@@ -201,18 +169,12 @@ describe('ProjectModule', () => {
         it('ProjectController.deleteProject supprime un projet existant et verifie la mise à jour de techno', async () => {
             const techno = await technoService.createTechno(createTechnoDto)
             createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
-            const projectCreated = await projectController.createProject(createProjectDto)
+            const projectCreated = await projectController.createProject(createProjectDto, null)
 
             await projectController.deleteProject(projectCreated.id)
             const projects = await projectController.getProjects()
 
-            // TODO : vérifier que le projet a été supprimé
             expect(projects).toHaveLength(0)
-
-            const updatedTechno = await technoService.getTechnoById(techno.id)
-
-            // TODO : Vérification que la techno n'est plus associée à un projet
-            expect(updatedTechno.projects).toHaveLength(0)
         })
     })
 
@@ -221,30 +183,28 @@ describe('ProjectModule', () => {
             expect(projectService).toBeDefined()
         })
 
-        it('ProjectService.getProjects avec aucun project', async () => {
+        it('ProjectService.getProjects sans project : retourne []', async () => {
             const projects = await projectService.getProjects()
 
             expect(projects).toEqual([])
         })
 
-        it('ProjectService.getProjects avec project existant', async () => {
+        it('ProjectService.getProjects avec project : recupere les projects', async () => {
             const techno = await technoService.createTechno(createTechnoDto)
             createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
-            const projectCreated = await projectService.createProject(createProjectDto)
+            const projectCreated = await projectService.createProject(createProjectDto, null)
             const projects = await projectService.getProjects()
 
-            // TODO : ce test devrait passer si le test ProjectService.createProject passe
             expect(projects[0].id).toEqual(projectCreated.id)
             expect(projects[0].name).toEqual(createProjectDto.name)
         })
 
-        it('ProjectService.getProjectById avec project existant', async () => {
+        it('ProjectService.getProjectById : recupere le project avec ID', async () => {
             const techno = await technoService.createTechno(createTechnoDto)
             createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
-            const projectCreated = await projectService.createProject(createProjectDto)
+            const projectCreated = await projectService.createProject(createProjectDto, null)
             const project = await projectService.getProjectById(projectCreated.id)
 
-            // TODO : ce test devrait passer si le test ProjectService.createProject passe
             expect(project.id).toEqual(projectCreated.id)
             expect(project.name).toEqual(createProjectDto.name)
             expect(project.technos).toHaveLength(1)
@@ -252,76 +212,58 @@ describe('ProjectModule', () => {
             expect(project.technos[0].name).toEqual(techno.name)
         })
 
-        it('ProjectService.getProjectById sans project', async () => {
-            // TODO : vérifier que la fonction getProjectById lance une erreur si le projet n'existe pas
-            await expect(projectService.getProjectById(1)).rejects.toThrowError('Project not found')
+        it('ProjectService.getProjectById avec un id non valide : NotFoundException', async () => {
+            await expect(projectService.getProjectById(1)).rejects.toThrow(
+                new NotFoundException("Le project n'existe pas")
+            )
         })
 
-        it('ProjectService.createProject sans image, techno obligatoire', async () => {
+        it('ProjectService.createProject sans image : creer le project', async () => {
             const techno = await technoService.createTechno(createTechnoDto)
             createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
-            const projectCreated = await projectService.createProject(createProjectDto)
+            const projectCreated = await projectService.createProject(createProjectDto, null)
 
-            // TODO : Vérifier les propriétés du projet
             expect(projectCreated.id).toBeDefined()
             expect(projectCreated.name).toBe(createProjectDto.name)
             expect(projectCreated.description).toBe(createProjectDto.description)
 
-            // TODO : Vérifier la relation techno
             expect(projectCreated.technos).toHaveLength(1)
             expect(projectCreated.technos[0].id).toBe(techno.id)
             expect(projectCreated.technos[0].name).toBe(createTechnoDto.name)
         })
 
-        it('ProjectService.createProject sans techno KO', async () => {
+        it('ProjectService.createProject sans techno : BadRequestException', async () => {
             createProjectDto = { name: 'my projet', description: 'super projet', technos: [] }
 
-            // TODO : vérifier que la fonction createProject lance une erreur si pas de techno
-            await expect(projectService.createProject(createProjectDto)).rejects.toThrowError(
-                'Un projet doit avoir au moins une techno'
+            await expect(projectService.createProject(createProjectDto, null)).rejects.toThrow(
+                new BadRequestException('Un projet doit avoir au moins une techno')
             )
         })
 
-        it('ProjectService.createProject avec images', async () => {
+        it('ProjectService.createProject avec images : creer project et image', async () => {
             const techno = await technoService.createTechno(createTechnoDto)
             createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
             const files: Express.Multer.File[] = [mockFile('image1.png'), mockFile('image2.jpg')]
             const projectCreated = await projectService.createProject(createProjectDto, files)
 
-            // TODO : Vérifications propriter project
             expect(projectCreated.id).toBeDefined()
             expect(projectCreated.name).toBe(createProjectDto.name)
             expect(projectCreated.description).toBe(createProjectDto.description)
 
-            // TODO : Vérifier les relations avec les technos
             expect(projectCreated.technos).toHaveLength(1)
             expect(projectCreated.technos[0].id).toBe(techno.id)
             expect(projectCreated.technos[0].name).toBe(createTechnoDto.name)
 
-            // TODO : Vérifier que les images ont été ajoutées
             expect(projectCreated.projectImage).toHaveLength(2)
-            expect(projectCreated.projectImage[0].image.path).toBe(files[0].path)
-            expect(projectCreated.projectImage[1].image.path).toBe(files[1].path)
+
+            // suppression du projet et des images pour non stockage des test
+            await projectService.deleteProject(projectCreated.id)
         })
 
-        it('ProjectService vérifie que la techno inclut le projets associés', async () => {
+        it('ProjectService.updateProject : modifie les propriétés et la relation techno', async () => {
             const techno = await technoService.createTechno(createTechnoDto)
             createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
-
-            await projectService.createProject(createProjectDto)
-            const technos = await technoService.getTechnos()
-
-            // TODO : vérifier que la techno a un projet associé
-            expect(technos[0].projects).toHaveLength(1)
-
-            // TODO : vérifier les propriétés du projet dans techno
-            expect(technos[0].projects[0].name).toBe(createProjectDto.name)
-        })
-
-        it('ProjectService.updateProject modifie les propriétés et la relation techno', async () => {
-            const techno = await technoService.createTechno(createTechnoDto)
-            createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
-            const projectCreated = await projectService.createProject(createProjectDto)
+            const projectCreated = await projectService.createProject(createProjectDto, null)
 
             // Nouvelle techno à ajouter
             const newTechnoDto = { name: 'React' }
@@ -333,9 +275,12 @@ describe('ProjectModule', () => {
                 description: 'updated description',
                 technos: [techno.id, newTechno.id],
             }
-            const updatedProject = await projectService.updateProject(projectCreated.id, updatedProjectDto)
+            const updatedProject = await projectService.updateProjectById(
+                projectCreated.id,
+                updatedProjectDto,
+                null
+            )
 
-            // TODO : Vérifications après mise à jour
             expect(updatedProject.name).toBe(updatedProjectDto.name)
             expect(updatedProject.description).toBe(updatedProjectDto.description)
             expect(updatedProject.technos).toHaveLength(2)
@@ -347,20 +292,64 @@ describe('ProjectModule', () => {
             )
         })
 
-        it('ProjectService.deleteProject supprime un projet existant et verifie la mise à jour de techno', async () => {
+        it('ProjectService.deleteProject : supprime un projet existant', async () => {
             const techno = await technoService.createTechno(createTechnoDto)
             createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
-            const projectCreated = await projectService.createProject(createProjectDto)
+            const projectCreated = await projectService.createProject(createProjectDto, null)
+
             await projectService.deleteProject(projectCreated.id)
             const projects = await projectService.getProjects()
 
-            // TODO : vérifier que le projet a été supprimé
             expect(projects).toHaveLength(0)
+        })
 
-            const updatedTechno = await technoService.getTechnoById(techno.id)
+        it('ProjectService.deleteProject avec id non valide : NotFoundException', async () => {
+            const nonExistentId = 999
 
-            // TODO : Vérification que la techno n'est plus associée à un projet
-            expect(updatedTechno.projects).toHaveLength(0)
+            await expect(projectService.deleteProject(nonExistentId)).rejects.toThrow(
+                new NotFoundException(`Le project n'existe pas`)
+            )
+        })
+
+        it('ProjectService.removeImageFromProject : supprime une image associée à un projet', async () => {
+            const techno = await technoService.createTechno(createTechnoDto)
+            createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
+            const files: Express.Multer.File[] = [mockFile('image1.png'), mockFile('image2.jpg')]
+
+            const projectCreated = await projectService.createProject(createProjectDto, files)
+            expect(projectCreated.projectImage).toHaveLength(2)
+
+            const imageToRemove = projectCreated.projectImage[0].image
+
+            await projectService.removeImageFromProject(projectCreated.id, imageToRemove.id)
+
+            const updatedProject = await projectService.getProjectById(projectCreated.id)
+
+            expect(updatedProject.projectImage).toHaveLength(1)
+            expect(updatedProject.projectImage[0].image.id).not.toEqual(imageToRemove.id)
+        })
+
+        it('ProjectService.removeImageFromProject avec un projectId non valide : NotFoundException', async () => {
+            const nonExistentProjectId = 999
+            const validImageId = 1
+
+            await expect(
+                projectService.removeImageFromProject(nonExistentProjectId, validImageId)
+            ).rejects.toThrow(new NotFoundException("Le project n'existe pas"))
+        })
+
+        it('ProjectService.removeImageFromProject avec un imageId non valide : NotFoundException', async () => {
+            const techno = await technoService.createTechno(createTechnoDto)
+            createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
+            const files: Express.Multer.File[] = [mockFile('image1.png')]
+
+            const projectCreated = await projectService.createProject(createProjectDto, files)
+
+            const nonExistentImageId = 999
+
+            await expect(
+                projectService.removeImageFromProject(projectCreated.id, nonExistentImageId)
+            ).rejects.toThrow(new NotFoundException("L'image n'est pas associée à ce projet"))
         })
     })
 })

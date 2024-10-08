@@ -26,6 +26,7 @@ export class Project {
     technos: Techno[]
 
     @OneToMany(() => ProjectImage, (projectImage) => projectImage.project, {
+        cascade: true,
         eager: true,
         nullable: true,
     })
