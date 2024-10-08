@@ -80,6 +80,11 @@ export class ProjectController {
     @Put('project/:id')
     @ApiConsumes('multipart/form-data')
     @ApiResponse({
+        status: 200,
+        description: 'Le projet a été modifier',
+        type: Project,
+    })
+    @ApiResponse({
         status: 500,
         type: HttpExceptionResponse,
         description: `${InternalServerErrorException.name} => Une erreur server est survenue`,
@@ -96,8 +101,8 @@ export class ProjectController {
     })
     @UseInterceptors(FilesInterceptor('images'))
     async updateProjectById(
-        @Param() id: number,
-        updateProjectDto: UpdateProjectDto,
+        @Param('id') id: number,
+        @Body() updateProjectDto: UpdateProjectDto,
         @UploadedFiles() files?: Array<Express.Multer.File>
     ) {
         return await this.projectService.updateProjectById(id, updateProjectDto, files)
@@ -114,7 +119,7 @@ export class ProjectController {
         type: HttpExceptionResponse,
         description: `${NotFoundException.name} => Le projet n'a pas été trouvée`,
     })
-    async deleteProject(@Param() id: number) {
+    async deleteProject(@Param('id') id: number) {
         return await this.projectService.deleteProject(id)
     }
 
