@@ -16,11 +16,15 @@ help:
 	@echo "Commandes disponibles :"
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  make %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-.PHONY: up up-api up-db down down-api down-db
+.PHONY: up up-d up-api up-db down down-api down-db
 
-up: ## Lancer tous les conteneurs (API + BDD)
+up: ## Lancer tous les conteneurs (API + BDD) avec logs
 	@echo "Lancement de tous les conteneurs (API + BDD)..."
 	$(DOCKER_COMPOSE) up
+
+up-d: ## Lancer tous les conteneurs (API + BDD) sans logs
+	@echo "Lancement de tous les conteneurs (API + BDD)..."
+	$(DOCKER_COMPOSE) up -d
 
 up-api: ## Lancer uniquement le conteneur API
 	@echo "Lancement du conteneur API..."
