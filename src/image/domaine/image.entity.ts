@@ -1,6 +1,7 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
 import { ProjectImage } from '../../project-image/domaine/project-image.entity'
+import { Service } from 'src/service/domaine/service.entity'
 
 @Entity()
 export class Image {
@@ -16,4 +17,9 @@ export class Image {
         nullable: true,
     })
     projectImage?: ProjectImage
+
+    @OneToOne(() => Service, (service) => service.image, {
+        nullable: true,
+    })
+    service?: Service
 }
