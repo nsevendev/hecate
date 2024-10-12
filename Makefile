@@ -26,11 +26,11 @@ up-d: ## Lancer tous les conteneurs (API + BDD) sans logs
 	@echo "Lancement de tous les conteneurs (API + BDD)..."
 	$(DOCKER_COMPOSE) up -d
 
-up-api: ## Lancer uniquement le conteneur API
+up-api-d: ## Lancer uniquement le conteneur API sans log
 	@echo "Lancement du conteneur API..."
 	$(DOCKER_COMPOSE) up api -d
 
-up-db: ## Lancer uniquement le conteneur BDD
+up-db-d: ## Lancer uniquement le conteneur BDD sans log
 	@echo "Lancement du conteneur de la base de données..."
 	$(DOCKER_COMPOSE) up db -d
 
