@@ -82,6 +82,10 @@ test-vw: ## Exécuter les tests en mode watch + verbose (jest --watch --verbose)
 	@echo "Exécution des tests en mode watch + verbose dans le conteneur..."
 	$(DOCKER_EXEC) "npm run test:vw"
 
+test-cov: ## Exécuter les tests en mode coverage (jest --coverage)
+	@echo "Exécuter les tests en mode coverage (jest --coverage)..."
+	$(DOCKER_EXEC) "npm run test:cov"
+
 .PHONY: migration-g
 
 migration-g: ## Creer une migration
