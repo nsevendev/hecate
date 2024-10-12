@@ -86,6 +86,10 @@ test-cov: ## Exécuter les tests en mode coverage (jest --coverage)
 	@echo "Exécuter les tests en mode coverage (jest --coverage)..."
 	$(DOCKER_EXEC) "npm run test:cov"
 
+test-mj: ## Exécuter les tests en mode interface avec majestic
+	@echo "Exécuter les tests en mode interface avec majestic..."
+	$(DOCKER_EXEC) "npm run majestic"
+
 .PHONY: migration-g
 
 migration-g: ## Creer une migration

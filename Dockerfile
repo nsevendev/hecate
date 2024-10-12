@@ -17,6 +17,7 @@ COPY --chown=node:node ./ ./
 COPY --chown=node:node scripts/install-deps.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/install-deps.sh
 EXPOSE 3000
+EXPOSE 4000
 ENTRYPOINT ["install-deps.sh"]
 CMD ["npm", "run", "start:dev"]
 
