@@ -12,8 +12,9 @@ import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { ImageModule } from '../image/image.module'
 import { TechnoModule } from '../techno/techno.module'
 import { ProjectImage } from '../project-image/domaine/project-image.entity'
+import { ProjectModule } from './project.module'
 
-describe('ProjectModule', () => {
+describe('Project', () => {
   let projectService: ProjectService
   let projectController: ProjectController
   let technoService: TechnoService
@@ -35,9 +36,8 @@ describe('ProjectModule', () => {
     }).compile()
 
     projectService = module.get<ProjectService>(ProjectService)
-    projectController = module.get<ProjectController>(ProjectController)
-
     technoService = module.get<TechnoService>(TechnoService)
+    projectController = module.get<ProjectController>(ProjectController)
 
     createTechnoDto = { name: 'Angular' }
 
@@ -52,6 +52,28 @@ describe('ProjectModule', () => {
       filename,
       path: `uploads/${filename}`,
       stream: undefined,
+    })
+  })
+
+  describe('ProjectModule', () => {
+    let moduleProject: TestingModule
+
+    beforeAll(async () => {
+      moduleProject = await Test.createTestingModule({
+        imports: [DatabaseTestModule, ProjectModule],
+      }).compile()
+    })
+
+    it('ProjectModule est defini', () => {
+      expect(moduleProject).toBeDefined()
+    })
+
+    it('ProjectModule : Les services et contrôleurs sont injectés', () => {
+      const projectService = moduleProject.get<ProjectService>(ProjectService)
+      const projectController = moduleProject.get<ProjectController>(ProjectController)
+
+      expect(projectService).toBeDefined()
+      expect(projectController).toBeDefined()
     })
   })
 
@@ -132,6 +154,9 @@ describe('ProjectModule', () => {
       expect(projectCreated.technos[0].name).toBe(createTechnoDto.name)
 
       expect(projectCreated.projectImage).toHaveLength(2)
+
+      // suppression du projet et des images pour non stockage des test
+      await projectService.deleteProject(projectCreated.id)
     })
 
     it('ProjectController.updateProject modifie les propriétés et la relation techno', async () => {
@@ -175,6 +200,23 @@ describe('ProjectModule', () => {
       const projects = await projectController.getProjects()
 
       expect(projects).toHaveLength(0)
+    })
+
+    it('ProjectController.removeImageFromProject supprime une image du project', async () => {
+      const techno = await technoService.createTechno(createTechnoDto)
+      createProjectDto = { name: 'my projet', description: 'super projet', technos: [techno.id] }
+      const files: Express.Multer.File[] = [mockFile('image1.png'), mockFile('image2.jpg')]
+      const projectCreated = await projectController.createProject(createProjectDto, files)
+
+      const project = await projectController.removeImageFromProject(
+        projectCreated.id,
+        projectCreated.projectImage[0].image.id
+      )
+
+      expect(project.projectImage).toHaveLength(1)
+
+      // suppression du projet et des images pour non stockage des test
+      await projectService.deleteProject(projectCreated.id)
     })
   })
 
@@ -350,6 +392,9 @@ describe('ProjectModule', () => {
       await expect(
         projectService.removeImageFromProject(projectCreated.id, nonExistentImageId)
       ).rejects.toThrow(new NotFoundException("L'image n'est pas associée à ce projet"))
+
+      // suppression du projet et des images pour non stockage des test
+      await projectService.deleteProject(projectCreated.id)
     })
   })
 })
