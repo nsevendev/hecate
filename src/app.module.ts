@@ -4,7 +4,8 @@ import { ConfigModule } from '@nestjs/config'
 import { DatabaseModule } from './database/database.module'
 import { DatabaseTestModule } from './database-test/database-test.module'
 import { ImageModule } from './image/image.module'
-import { TechnoModule } from './techno/techno.module';
+import { TechnoModule } from './techno/techno.module'
+import { ProjectModule } from './project/project.module'
 
 @Module({
     imports: [
@@ -14,6 +15,7 @@ import { TechnoModule } from './techno/techno.module';
         PingModule,
         ImageModule,
         TechnoModule,
+        ProjectModule,
     ],
     controllers: [],
     providers: [],

@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
+import { Project } from '../../project/domaine/project.entity'
 
 @Entity()
 export class Techno {
@@ -10,4 +11,10 @@ export class Techno {
     @Column()
     @ApiProperty({ description: 'Nom de la techno' })
     name: string
+
+    @ManyToMany(() => Project, (project) => project.technos, {
+        onDelete: 'CASCADE',
+        nullable: true,
+    })
+    projects?: Project[]
 }
