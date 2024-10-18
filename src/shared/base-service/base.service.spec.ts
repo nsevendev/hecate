@@ -10,7 +10,7 @@ describe('BaseService', () => {
             }
 
             test = () => {
-                this.logger.log('test')
+                this.logger.log('test du logger')
                 return true
             }
         }
