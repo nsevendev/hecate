@@ -11,130 +11,119 @@ import { UpdateProjectDto } from './update-project.dto'
 
 @Injectable()
 export class ProjectService extends BaseService {
-    constructor(
-        private readonly projectRepository: ProjectRepository,
-        private readonly imageService: ImageService,
-        private readonly technoService: TechnoService,
-        @InjectRepository(ProjectImage)
-        private readonly projectImageRepository: Repository<ProjectImage>
-    ) {
-        super('ProjectService')
+  constructor(
+    private readonly projectRepository: ProjectRepository,
+    private readonly imageService: ImageService,
+    private readonly technoService: TechnoService,
+    @InjectRepository(ProjectImage)
+    private readonly projectImageRepository: Repository<ProjectImage>
+  ) {
+    super('ProjectService')
+  }
+
+  getProjects = async () => {
+    return await this.projectRepository.repository.find({
+      relations: ['technos', 'projectImage.image'],
+    })
+  }
+
+  getProjectById = async (id: number) => {
+    const project = await this.projectRepository.repository.findOne({
+      where: { id },
+      relations: ['technos', 'projectImage.image'],
+    })
+
+    if (!project) {
+      throw new NotFoundException("Le project n'existe pas")
     }
 
-    getProjects = async () => {
-        return await this.projectRepository.repository.find({
-            relations: ['technos', 'projectImage.image'],
-        })
+    return project
+  }
+
+  createProject = async (createProjectDto: CreateProjectDto, files: Array<Express.Multer.File>) => {
+    if (!createProjectDto.technos || createProjectDto.technos.length === 0) {
+      throw new BadRequestException('Un projet doit avoir au moins une techno')
     }
 
-    getProjectById = async (id: number) => {
-        const project = await this.projectRepository.repository.findOne({
-            where: { id },
-            relations: ['technos', 'projectImage.image'],
-        })
+    const technos = await this.technoService.getTechnoByIds(createProjectDto.technos)
+    const project = await this.projectRepository.createProject(createProjectDto, technos)
 
-        if (!project) {
-            throw new NotFoundException("Le project n'existe pas")
-        }
+    if (files && files.length > 0) {
+      const images = await this.imageService.createImages(files)
 
-        return project
+      project.projectImage = images.map((image) => {
+        return this.projectImageRepository.create({ project, image })
+      })
+
+      await this.projectRepository.repository.save(project)
     }
 
-    createProject = async (createProjectDto: CreateProjectDto, files: Array<Express.Multer.File>) => {
-        if (!createProjectDto.technos || createProjectDto.technos.length === 0) {
-            throw new BadRequestException('Un projet doit avoir au moins une techno')
-        }
+    return project
+  }
 
-        const technos = await this.technoService.getTechnoByIds(createProjectDto.technos)
-
-        let project = this.projectRepository.repository.create({
-            ...createProjectDto,
-            technos,
-            projectImage: null,
-        })
-
-        project = await this.projectRepository.repository.save(project)
-
-        if (files && files.length > 0) {
-            const images = await this.imageService.createImages(files)
-
-            project.projectImage = images.map((image) => {
-                const projectImage = this.projectImageRepository.create({ project, image })
-                projectImage.image = image
-                return projectImage
-            })
-
-            await this.projectRepository.repository.save(project)
-        }
-
-        return project
+  updateProjectById = async (
+    id: number,
+    updatedProjectDto: UpdateProjectDto,
+    files: Array<Express.Multer.File>
+  ) => {
+    if (!updatedProjectDto.technos || updatedProjectDto.technos.length === 0) {
+      throw new BadRequestException('Il faut au moins une techno pour créer un projet')
     }
 
-    updateProjectById = async (
-        id: number,
-        updatedProjectDto: UpdateProjectDto,
-        files: Array<Express.Multer.File>
-    ) => {
-        if (!updatedProjectDto.technos || updatedProjectDto.technos.length === 0) {
-            throw new BadRequestException('Il faut au moins une techno pour créer un projet')
-        }
+    const existingProject = await this.getProjectById(id)
+    const technos = await this.technoService.getTechnoByIds(updatedProjectDto.technos)
 
-        const existingProject = await this.getProjectById(id)
-
-        const technos = await this.technoService.getTechnoByIds(updatedProjectDto.technos)
-
-        const updatedProject = {
-            ...existingProject,
-            ...updatedProjectDto,
-            technos: technos,
-        }
-
-        await this.projectRepository.repository.save(updatedProject)
-
-        if (files && files.length > 0) {
-            const newImages = await this.imageService.createImages(files)
-
-            const projectImages = newImages.map((image) =>
-                this.projectImageRepository.create({ project: updatedProject, image })
-            )
-
-            updatedProject.projectImage = [...(updatedProject.projectImage || []), ...projectImages]
-
-            await this.projectRepository.repository.save(updatedProject)
-        }
-
-        return updatedProject
+    const updatedProject = {
+      ...existingProject,
+      ...updatedProjectDto,
+      technos: technos,
     }
 
-    removeImageFromProject = async (projectId: number, imageId: number) => {
-        const project = await this.getProjectById(projectId)
+    await this.projectRepository.repository.save(updatedProject)
 
-        const projectImageToRemove = project.projectImage.find((pi) => pi.image.id === imageId)
+    if (files && files.length > 0) {
+      const newImages = await this.imageService.createImages(files)
 
-        if (!projectImageToRemove) {
-            throw new NotFoundException("L'image n'est pas associée à ce projet")
-        }
+      const projectImages = newImages.map((image) => {
+        return this.projectImageRepository.create({ project: updatedProject, image })
+      })
 
-        await this.imageService.deleteImageByIdAndDeleteFromStorage(imageId)
+      updatedProject.projectImage = [...(updatedProject.projectImage || []), ...projectImages]
 
-        project.projectImage = project.projectImage?.filter((pi) => pi.image.id !== imageId)
-
-        return await this.projectRepository.repository.save(project)
+      await this.projectRepository.repository.save(updatedProject)
     }
 
-    deleteProject = async (id: number) => {
-        const project = await this.getProjectById(id)
+    return updatedProject
+  }
 
-        if (!project) {
-            throw new NotFoundException("Le project n'existe pas")
-        }
+  removeImageFromProject = async (projectId: number, imageId: number) => {
+    const project = await this.getProjectById(projectId)
+    const projectImageToRemove = project.projectImage.find((pi) => pi.image.id === imageId)
 
-        if (project.projectImage && project.projectImage.length > 0) {
-            project.projectImage.forEach((pi) => {
-                this.imageService.deleteImageByIdAndDeleteFromStorage(pi.image.id)
-            })
-        }
-
-        return await this.projectRepository.repository.remove(project)
+    if (!projectImageToRemove) {
+      throw new NotFoundException("L'image n'est pas associée à ce projet")
     }
+
+    await this.imageService.deleteImageByIdAndDeleteFromStorage(imageId)
+
+    project.projectImage = project.projectImage?.filter((pi) => pi.image.id !== imageId)
+
+    return await this.projectRepository.repository.save(project)
+  }
+
+  deleteProject = async (id: number) => {
+    const project = await this.getProjectById(id)
+
+    if (!project) {
+      throw new NotFoundException("Le project n'existe pas")
+    }
+
+    if (project.projectImage && project.projectImage.length > 0) {
+      project.projectImage.forEach((pi) => {
+        this.imageService.deleteImageByIdAndDeleteFromStorage(pi.image.id)
+      })
+    }
+
+    return await this.projectRepository.repository.remove(project)
+  }
 }

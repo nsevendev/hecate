@@ -85,7 +85,17 @@
             "^.+\\.(t|j)s$": "ts-jest"
         },
         "collectCoverageFrom": [
-            "**/*.(t|j)s"
+            "**/*.(t|j)s",
+            "!**/node_modules/**",
+            "!**/dist/**",
+            "!**/test/**",
+            "!**/fixture/**",
+            "!**/migrations/**",
+            "!**/swagger/**",
+            "!**/main.ts",
+            "!**/typeorm.config.ts",
+            "!**/app.module.ts",
+            "!**/database/**"
         ],
         "coverageDirectory": "../coverage",
         "testEnvironment": "node",

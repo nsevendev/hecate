@@ -15,27 +15,27 @@ let dataSource: DataSource
 let queryRunner: QueryRunner
 
 beforeAll(async () => {
-    dataSource = await dataSourceJest.initialize()
+  dataSource = await dataSourceJest.initialize()
 })
 
 beforeEach(async () => {
-    queryRunner = dataSource.createQueryRunner()
-    await queryRunner.connect()
-    await queryRunner.startTransaction()
+  queryRunner = dataSource.createQueryRunner()
+  await queryRunner.connect()
+  await queryRunner.startTransaction()
 })
 
 afterEach(async () => {
-    await queryRunner.rollbackTransaction()
-    await queryRunner.release()
+  await queryRunner.rollbackTransaction()
+  await queryRunner.release()
 
-    const entities = dataSource.entityMetadatas
+  const entities = dataSource.entityMetadatas
 
-    for (const entity of entities) {
-        const repository = dataSource.getRepository(entity.name)
-        await repository.query(`TRUNCATE TABLE "${entity.tableName}" RESTART IDENTITY CASCADE;`)
-    }
+  for (const entity of entities) {
+    const repository = dataSource.getRepository(entity.name)
+    await repository.query(`TRUNCATE TABLE "${entity.tableName}" RESTART IDENTITY CASCADE;`)
+  }
 })
 
 afterAll(async () => {
-    await dataSource.destroy()
+  await dataSource.destroy()
 })
