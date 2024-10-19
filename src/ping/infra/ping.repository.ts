@@ -5,15 +5,15 @@ import { InjectRepository } from '@nestjs/typeorm'
 
 @Injectable()
 export class PingRepository {
-    constructor(
-        @InjectRepository(Ping)
-        public repository: Repository<Ping>
-    ) {}
+  constructor(
+    @InjectRepository(Ping)
+    public repository: Repository<Ping>
+  ) {}
 
-    findFirst = async () => {
-        return await this.repository.find({
-            order: { id: 'ASC' },
-            take: 1,
-        })
-    }
+  findFirst = async () => {
+    return await this.repository.find({
+      order: { id: 'ASC' },
+      take: 1,
+    })
+  }
 }
