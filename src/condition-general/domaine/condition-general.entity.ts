@@ -16,6 +16,10 @@ export class ConditionGeneral {
   @ApiProperty({ description: 'Sous titre de la condition genereal' })
   intro?: string
 
+  @Column({ default: false })
+  @ApiProperty({ description: "Defini si c'est cette condition general qui est active ou pas" })
+  activate: boolean
+
   @OneToMany(() => ArticleCg, (articlecgs) => articlecgs.conditionGeneral, {
     eager: true,
     cascade: true,

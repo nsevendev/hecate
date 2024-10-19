@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator'
+import { IsOptional, IsString, IsBoolean } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 
 export class CreateConditionGeneralDto {
@@ -10,4 +10,12 @@ export class CreateConditionGeneralDto {
   @IsString()
   @IsOptional()
   intro?: string
+
+  @ApiProperty({
+    example: 'true',
+    description: 'Defini si la condition est active ou pas (par defaut false)',
+  })
+  @IsBoolean()
+  @IsOptional()
+  activate?: boolean = false
 }

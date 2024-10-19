@@ -5,10 +5,13 @@ import { ArticleCg } from '../domaine/article-cg.entity'
 import { In } from 'typeorm'
 import { UpdateArticleCgDto } from './dto/update-article-cg.dto'
 import { ConditionGeneral } from '../../condition-general/domaine/condition-general.entity'
+import { BaseService } from '../../shared/base-service/base.service'
 
 @Injectable()
-export class ArticleCgService {
-  constructor(private readonly articleCgRepository: ArticleCgRepository) {}
+export class ArticleCgService extends BaseService {
+  constructor(private readonly articleCgRepository: ArticleCgRepository) {
+    super('ArticleCgService')
+  }
 
   getArticleCgs = async () => {
     return await this.articleCgRepository.repository.find()

@@ -4,9 +4,10 @@ import { ConditionGeneralRepository } from './infra/condition-general.repository
 import { ConditionGeneralController } from './app/condition-general.controller'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConditionGeneral } from './domaine/condition-general.entity'
+import { ArticleCgModule } from '../article-cg/article-cg.module'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ConditionGeneral])],
+  imports: [TypeOrmModule.forFeature([ConditionGeneral]), ArticleCgModule],
   controllers: [ConditionGeneralController],
   providers: [ConditionGeneralService, ConditionGeneralRepository],
   exports: [ConditionGeneralService, ConditionGeneralRepository],
