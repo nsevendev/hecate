@@ -25,6 +25,6 @@ export class ConditionGeneral {
     cascade: true,
     nullable: true,
   })
-  @ApiProperty({ description: 'Liste des articles de la condition general' })
+  @ApiProperty({ description: 'Liste des articles de la condition general', type: () => [ArticleCg] })
   articlecgs?: ArticleCg[]
 }
