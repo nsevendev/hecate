@@ -1,18 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { ArticleCgRepository } from './article-cg.repository'
+import { DatabaseTestModule } from '../../database-test/database-test.module'
+import { ArticleCgModule } from '../article-cg.module'
 
 describe('ArticleCgRepository', () => {
-  let service: ArticleCgRepository
+  let repository: ArticleCgRepository
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ArticleCgRepository],
+      imports: [DatabaseTestModule, ArticleCgModule],
     }).compile()
 
-    service = module.get<ArticleCgRepository>(ArticleCgRepository)
+    repository = module.get<ArticleCgRepository>(ArticleCgRepository)
   })
 
-  it('should be defined', () => {
-    expect(service).toBeDefined()
+  it('ArticleCgRepository : est defini', () => {
+    expect(repository).toBeDefined()
   })
 })
