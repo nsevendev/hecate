@@ -9,9 +9,9 @@ import { ImageModule } from '../image/image.module'
 import { TechnoModule } from '../techno/techno.module'
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Project, ProjectImage]), ImageModule, TechnoModule],
-    providers: [ProjectService, ProjectRepository],
-    exports: [ProjectService, ProjectRepository],
-    controllers: [ProjectController],
+  imports: [TypeOrmModule.forFeature([Project, ProjectImage]), ImageModule, TechnoModule],
+  providers: [ProjectService, ProjectRepository],
+  exports: [ProjectService, ProjectRepository],
+  controllers: [ProjectController],
 })
 export class ProjectModule {}
