@@ -57,8 +57,6 @@ export class ConditionGeneralService extends BaseService {
   deleteArticlesFromConditionGeneralById = async (id: number, articleCgIds: number[]) => {
     await this.articleCgService.deleteArticleByIds(articleCgIds)
 
-    //const updatedCg = await this.getConditionGeneralById(id)
-
     return await this.getConditionGeneralById(id)
   }
 
