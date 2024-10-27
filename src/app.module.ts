@@ -8,6 +8,9 @@ import { TechnoModule } from './techno/techno.module'
 import { ProjectModule } from './project/project.module'
 import { ConditionGeneralModule } from './condition-general/condition-general.module'
 import { ArticleCgModule } from './article-cg/article-cg.module'
+import { UserModule } from './user/user.module'
+import { RoleModule } from './role/role.module'
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,6 +23,9 @@ import { ArticleCgModule } from './article-cg/article-cg.module'
     ProjectModule,
     ConditionGeneralModule,
     ArticleCgModule,
+    UserModule,
+    RoleModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
