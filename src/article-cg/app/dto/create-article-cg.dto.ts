@@ -2,11 +2,11 @@ import { IsString } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 
 export class CreateArticleCgDto {
-  @ApiProperty({ example: 'Titre', description: "Titre de l'article" })
   @IsString()
+  @ApiProperty({ example: 'Titre', description: "Titre de l'article" })
   title: string
 
-  @ApiProperty({ example: 'Petit intro', description: "content de l'article" })
   @IsString()
+  @ApiProperty({ example: 'Petit intro', description: "content de l'article" })
   description?: string
 }

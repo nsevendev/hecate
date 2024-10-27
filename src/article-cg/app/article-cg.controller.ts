@@ -5,6 +5,7 @@ import {
   Get,
   InternalServerErrorException,
   NotFoundException,
+  Param,
   Put,
 } from '@nestjs/common'
 import { ArticleCgService } from './article-cg.service'
@@ -14,7 +15,7 @@ import { ArticleCg } from '../domaine/article-cg.entity'
 import { UpdateArticleCgDto } from './dto/update-article-cg.dto'
 
 @ApiTags('Article Cg Controller')
-@Controller('article-cg')
+@Controller()
 export class ArticleCgController {
   constructor(private readonly articleCgService: ArticleCgService) {}
 
@@ -45,7 +46,7 @@ export class ArticleCgController {
     type: HttpExceptionResponse,
     description: `${NotFoundException.name} => L'article n'existe pas`,
   })
-  async getArticleCgById(id: number) {
+  async getArticleCgById(@Param('id') id: number) {
     return await this.articleCgService.getArticleCgById(id)
   }
 
@@ -65,7 +66,7 @@ export class ArticleCgController {
     type: HttpExceptionResponse,
     description: `${NotFoundException.name} => "Un ou plusieurs articles n'existent pas`,
   })
-  async getArticleCgsByIds(ids: number[]) {
+  async getArticleCgsByIds(@Param('ids') ids: number[]) {
     return await this.articleCgService.getArticleCgsByIds(ids)
   }
 
@@ -85,7 +86,7 @@ export class ArticleCgController {
     type: HttpExceptionResponse,
     description: `${NotFoundException.name} => "L'articles n'exist pas`,
   })
-  async updateArticleCgById(id: number, @Body() updateArticleCgDto: UpdateArticleCgDto) {
+  async updateArticleCgById(@Param('id') id: number, @Body() updateArticleCgDto: UpdateArticleCgDto) {
     return await this.articleCgService.updateArticleCgById(id, updateArticleCgDto)
   }
 
@@ -105,7 +106,7 @@ export class ArticleCgController {
     type: HttpExceptionResponse,
     description: `${NotFoundException.name} => Un ou plusieurs articles n'existent pas`,
   })
-  async deleteArticleByIds(ids: number[]) {
+  async deleteArticleByIds(@Param('ids') ids: number[]) {
     return await this.articleCgService.deleteArticleByIds(ids)
   }
 }

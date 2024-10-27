@@ -6,16 +6,16 @@ export class CreateConditionGeneralDto {
   @ApiProperty({ example: 'Titre', description: 'Titre de la condition general' })
   title: string
 
-  @ApiProperty({ example: 'Petit intro', description: 'Introduction de la condition general' })
   @IsString()
   @IsOptional()
+  @ApiProperty({ example: 'Petit intro', description: 'Introduction de la condition general' })
   intro?: string
 
+  @IsBoolean()
+  @IsOptional()
   @ApiProperty({
     example: 'true',
     description: 'Defini si la condition est active ou pas (par defaut false)',
   })
-  @IsBoolean()
-  @IsOptional()
   activate?: boolean = false
 }
