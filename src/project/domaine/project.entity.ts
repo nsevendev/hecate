@@ -5,31 +5,31 @@ import { Techno } from '../../techno/domaine/techno.entity'
 
 @Entity()
 export class Project {
-    @PrimaryGeneratedColumn()
-    @ApiProperty({ description: 'id du projet' })
-    id: number
+  @PrimaryGeneratedColumn()
+  @ApiProperty({ description: 'id du projet' })
+  id: number
 
-    @Column()
-    @ApiProperty({ description: 'nom du projet' })
-    name: string
+  @Column()
+  @ApiProperty({ description: 'nom du projet' })
+  name: string
 
-    @Column()
-    @ApiProperty({ description: 'description du projet' })
-    description: string
+  @Column()
+  @ApiProperty({ description: 'description du projet' })
+  description: string
 
-    @ManyToMany(() => Techno, (techno) => techno.projects, {
-        onDelete: 'CASCADE',
-        eager: true,
-    })
-    @JoinTable()
-    @ApiProperty({ description: 'Liste des technos associées au projet' })
-    technos: Techno[]
+  @ManyToMany(() => Techno, (techno) => techno.projects, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  @JoinTable()
+  @ApiProperty({ description: 'Liste des technos associées au projet' })
+  technos: Techno[]
 
-    @OneToMany(() => ProjectImage, (projectImage) => projectImage.project, {
-        cascade: true,
-        eager: true,
-        nullable: true,
-    })
-    @ApiProperty({ description: 'Liste des images associées au projet' })
-    projectImage?: ProjectImage[]
+  @OneToMany(() => ProjectImage, (projectImage) => projectImage.project, {
+    cascade: true,
+    eager: true,
+    nullable: true,
+  })
+  @ApiProperty({ description: 'Liste des images associées au projet' })
+  projectImage?: ProjectImage[]
 }
