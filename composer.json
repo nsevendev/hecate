@@ -9,6 +9,7 @@
         "php": ">=8.3.13",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "nelmio/api-doc-bundle": "^4.33",
         "runtime/frankenphp-symfony": "^0.2.0",
         "symfony/console": "7.1.*",
         "symfony/dotenv": "7.1.*",
@@ -66,5 +67,9 @@
             "require": "7.1.*",
             "docker": true
         }
+    },
+    "require-dev": {
+        "symfony/maker-bundle": "^1.61",
+        "symfony/web-profiler-bundle": "7.1.*"
     }
 }
