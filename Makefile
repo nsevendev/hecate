@@ -9,9 +9,14 @@ PHP      = $(PHP_CONT) php
 COMPOSER = $(PHP_CONT) composer
 SYMFONY  = $(PHP) bin/console
 
+# Files env
+ENV_FILE_DEV = .env.dev.local
+ENV_FILE_TEST = .env.test.local
+ENV_FILE_PROD = .env.prod.local
+
 # Misc
 .DEFAULT_GOAL = help
-.PHONY        : help build up start down logs sh composer vendor sf cc test
+.PHONY        : help build up-dev up-test up-prod start-dev start-test start-prod down logs sh composer vendor sf cc test
 
 ## —— 🎵 🐳 The Symfony Docker Makefile 🐳 🎵 ——————————————————————————————————
 help: ## Outputs this help screen
@@ -21,10 +26,20 @@ help: ## Outputs this help screen
 build: ## Builds the Docker images
 	@$(DOCKER_COMP) build --pull --no-cache
 
-up: ## Start the docker hub in detached mode (no logs)
-	@$(DOCKER_COMP) up --detach
+up-dev: ## Start the docker hub mode dev in detached mode (no logs)
+	@$(DOCKER_COMP) --env-file $(ENV_FILE_DEV) up --detach
 
-start: build up ## Build and start the containers
+start-dev: build up-dev ## Build and start the containers mode dev
+
+up-test: ## Start the docker hub mode test in detached mode (no logs)
+	@$(DOCKER_COMP) --env-file $(ENV_FILE_TEST) up --detach
+
+start-test: build up-test ## Build and start the containers mode test
+
+up-prod: ## Start the docker hub mode prod in detached mode (no logs)
+	@$(DOCKER_COMP) --env-file $(ENV_FILE_PROD) up --detach
+
+start-prod: build up-prod ## Build and start the containers mode prod
 
 down: ## Stop the docker hub
 	@$(DOCKER_COMP) down --remove-orphans
