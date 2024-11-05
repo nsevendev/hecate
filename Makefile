@@ -8,6 +8,7 @@ PHP_CONT = $(DOCKER_COMP) exec php
 PHP      = $(PHP_CONT) php
 COMPOSER = $(PHP_CONT) composer
 SYMFONY  = $(PHP) bin/console
+SYMFONY_TEST  = $(PHP) bin/phpunit
 
 # Files env
 ENV_FILE_DEV = .env.dev.local
@@ -71,6 +72,10 @@ vendor: composer
 sf: ## List all Symfony commands or pass the parameter "c=" to run a given command, example: make sf c=about
 	@$(eval c ?=)
 	@$(SYMFONY) $(c)
+
+sf-test: ## List all Symfony commands or pass the parameter "c=" to run a given command, example: make sf c=about
+	@$(eval c ?=)
+	@$(SYMFONY_TEST) $(c)
 
 cc: c=c:c ## Clear the cache
 cc: sf
