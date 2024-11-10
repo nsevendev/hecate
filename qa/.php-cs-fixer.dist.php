@@ -29,6 +29,7 @@ return (new Config())
     ->setRules([
         '@Symfony' => true,
         'no_unused_imports' => true,
+        'global_namespace_import' => false,
         'no_extra_blank_lines' => true,
         'no_empty_phpdoc' => true,
         'single_line_empty_body' => true,

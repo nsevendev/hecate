@@ -7,17 +7,23 @@
 /config/secrets/dev/dev.decrypt.private.php
 /config/secrets/test/test.decrypt.private.php
 /public/bundles/
-/var/
+/var/*
+!var/log
+!var/cache
+/var/log/*
+/var/cache/*
+!var/log/.gitkeep
+!var/cache/.gitkeep
 /vendor/
 ###< symfony/framework-bundle ###
 
 ###> symfony/phpunit-bridge ###
 .phpunit.result.cache
-/phpunit.xml
+/tests/phpunit.xml
 ###< symfony/phpunit-bridge ###
 
 ###> phpunit/phpunit ###
-/phpunit.xml
+/tests/phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
 

@@ -17,18 +17,21 @@
         "symfony/dotenv": "~7.1.0",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "~7.1.0",
-        "symfony/runtime": "~7.1.0",
+        "symfony/runtime": "^7.1.7",
         "symfony/yaml": "~7.1.0"
     },
     "require-dev": {
+        "brianium/paratest": "^7.6",
+        "dama/doctrine-test-bundle": "^8.2",
         "ergebnis/composer-normalize": "^2.44",
+        "fakerphp/faker": "^1.24",
         "friendsofphp/php-cs-fixer": "^3.64",
         "phpstan/phpstan": "^1.12",
         "phpstan/phpstan-doctrine": "^1.5",
         "phpstan/phpstan-phpunit": "^1.4",
         "phpstan/phpstan-strict-rules": "^1.6",
         "phpstan/phpstan-symfony": "^1.4",
-        "phpunit/phpunit": "^9.5",
+        "phpunit/phpunit": "^11.4.3",
         "symfony/browser-kit": "~7.1.0",
         "symfony/css-selector": "~7.1.0",
         "symfony/maker-bundle": "^1.61",
@@ -52,13 +55,14 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "Hecate\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "App\\QualityAssurance\\": "qa/src",
-            "App\\Tests\\": "tests/"
+            "Hecate\\Fixtures\\": "fixtures",
+            "Hecate\\QualityAssurance\\": "qa/src",
+            "Hecate\\Tests\\": "tests"
         }
     },
     "config": {
@@ -91,6 +95,7 @@
         "check": [
             "@cs",
             "@ps",
+            "@test",
             "composer validate --strict",
             "composer normalize --dry-run"
         ],
@@ -109,6 +114,10 @@
             "@putenv XDEBUG_MODE=off",
             "bin/console cache:warmup",
             "phpstan --memory-limit=512M --configuration=qa/phpstan.dist.neon -v"
+        ],
+        "test": [
+            "@putenv XDEBUG_MODE=off",
+            "paratest --configuration=tests/phpunit.xml --colors=always --testsuite unit,database,functional --testdox"
         ]
     }
 }
