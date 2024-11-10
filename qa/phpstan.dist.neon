@@ -1,0 +1,20 @@
+includes:
+    - ../vendor/phpstan/phpstan-strict-rules/rules.neon
+    - ../vendor/phpstan/phpstan-symfony/extension.neon
+    - ../vendor/phpstan/phpstan-symfony/rules.neon
+    - ../vendor/phpstan/phpstan-doctrine/extension.neon
+    - ../vendor/phpstan/phpstan-phpunit/extension.neon
+
+parameters:
+    level: max
+    paths:
+        - ../src
+        - ../fixtures
+        - ../qa/src
+    tmpDir: ../var/cache/qa/phpstan
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        # \PHPStan\Rules\BooleansInConditions\BooleanIn*Rule
+        - '#Only booleans are allowed in#'
+    # symfony:
+    #     container_xml_path: ../var/cache/dev/KernelDevDebugContainer.xml
