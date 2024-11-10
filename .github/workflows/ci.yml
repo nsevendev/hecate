@@ -43,23 +43,10 @@ jobs:
         
       - name: Check HTTPS reachability
         if: false # Remove this line when the homepage will be configured, or change the path to check
-        run: curl -vk --fail-with-body https://localhost
-          
-      # Ajoutez ici une pause pour donner plus de temps aux conteneurs pour devenir healthy
-      - name: Wait for services to be healthy
-        run: sleep 30
-  
-      # Vérification de l'état de santé des conteneurs
-      - name: Check PHP container health status
-        run: docker inspect --format='{{json .State.Health.Status}}' hecate-php-1
-  
-      # Affichage des logs pour déboguer
-      - name: Display PHP container logs
-        run: docker compose logs php
-      
-      - name: Run Code Quality Check
-        # Exécute la commande check qui inclut les tests, csfixer, phpstan
-        run: docker compose exec -T php composer check   
+        run: curl -vk --fail-with-body https://localhost 
+        
+      - name: Create test database
+        run: docker compose exec -T composer check
       
       - name: Create test database
         if: false # Remove this line if Doctrine ORM is installed
