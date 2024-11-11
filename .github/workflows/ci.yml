@@ -4,49 +4,29 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
+  pull_request: ~
+  workflow_dispatch: ~
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
-  build:
+  tests:
+    name: Tests
     runs-on: ubuntu-latest
-
-    services:
-      docker:
-        image: docker:19.03.12
-        options: --privileged
-        ports:
-          - 127.0.0.1:3306:3306
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: test
-        volumes:
-          - /var/lib/mysql
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Cache Docker layers
-        uses: actions/cache@v2
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
+          php-version: '8.3' # Spécifiez la version PHP si nécessaire
+          tools: composer
 
-      - name: Build Docker image
-        run: docker build . -t my-symfony-app
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
 
-      - name: Run Docker container
-        run: docker run -d --name my-symfony-app-container my-symfony-app
-
-      - name: Install Composer dependencies
-        run: docker exec my-symfony-app-container composer install
-
-      - name: Run Composer check
-        run: docker exec my-symfony-app-container composer check
+      - name: Run Composer Check
+        run: composer check
