@@ -15,18 +15,49 @@ jobs:
   tests:
     name: Tests
     runs-on: ubuntu-latest
+    env:
+      # variable ecris en dur pour les tests
+      HTTP_PORT: 65008
+      HTTPS_PORT: 65009
+      HTTP3_PORT: 65010
+      POSTGRES_PORT: 53933
+      DATABASE_URL: "postgresql://heacte:hecate@database:5432/hecate?serverVersion=16&charset=utf8"
+      POSTGRES_VERSION: 16
+      POSTGRES_DB: hecate
+      POSTGRES_USER: hecate
+      POSTGRES_PASSWORD: hecate
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3' # Spécifiez la version PHP si nécessaire
-          tools: composer
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Install Dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build Docker images
+        run: docker compose -f compose.yaml -f compose.override.yaml build --pull --no-cache
+
+      - name: Start Docker services
+        run: docker compose -f compose.yaml -f compose.override.yaml up -d
+
+      - name: Wait for Database to be Ready
+        run: |
+          until docker compose exec -T database pg_isready -U $POSTGRES_USER; do
+            echo "Waiting for database...";
+            sleep 5;
+          done
 
       - name: Run Composer Check
-        run: composer check
+        run: docker compose exec php composer check
+
+      - name: Shut Down Docker Containers
+        if: always()
+        run: docker compose -f compose.yaml -f compose.override.yaml down --remove-orphans
