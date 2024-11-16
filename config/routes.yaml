@@ -1,5 +1,5 @@
 controllers:
     resource:
-        path: ../src/Application/
-        namespace: Hecate\Application
+        path: ../src/Controller/
+        namespace: Hecate\Controller
     type: attribute
