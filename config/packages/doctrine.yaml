@@ -8,6 +8,8 @@ doctrine:
 
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
+        types:
+            app_uid: 'Hecate\Infrastructure\Doctrine\Type\UidType'
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
@@ -21,8 +23,8 @@ doctrine:
             Hecate:
                 type: attribute
                 is_bundle: false
-                dir: '%kernel.project_dir%/src/Domain'
-                prefix: 'Hecate\Domain'
+                dir: '%kernel.project_dir%/src/Entity'
+                prefix: 'Hecate\Entity'
                 alias: Hecate
         controller_resolver:
             auto_mapping: false
