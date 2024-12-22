@@ -8,7 +8,7 @@ use Hecate\Infrastructure\ApiResponse\Exception\Custom\AbstractApiResponseExcept
 use Hecate\Infrastructure\ApiResponse\Exception\Error\Error;
 use Symfony\Component\HttpFoundation\Response;
 
-class PingException extends AbstractApiResponseException
+class PingBadRequestException extends AbstractApiResponseException
 {
     /**
      * @param string $getMessage

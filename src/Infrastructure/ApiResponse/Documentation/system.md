@@ -1,4 +1,15 @@
-# Gestion exception
+# Gestion ApiResponse
+
+## ApiResponse.php  
+
+- cette class permet de construire une réponse json standardisé propre à cette application.
+elle est utilisée dans les controllers pour retourner une réponse json ou utiliser dans le eventlistener `ApiResponseExceptionListener.php`  
+qui permet de retourner une réponse json standardisé propre à cette application en cas d'exception.
+
+## ApiResponseFactory.php  
+
+- cette class contient des fonctions static qui permettent de construire des reponses json standardisées rapidement  
+les exceptions utilise la fonction `toException` pour retorner ça réponse
 
 > Toutes les exceptions de l'application API sont gerées dans ce dossier. 
 > Et seulement les exceptions de l'application API.  
