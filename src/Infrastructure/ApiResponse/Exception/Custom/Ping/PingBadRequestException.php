@@ -11,8 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 class PingBadRequestException extends AbstractApiResponseException
 {
     /**
-     * @param string $getMessage
-     * @param int $statusCode
      * @param array<Error>|null $errors
      */
     public function __construct(

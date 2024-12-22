@@ -13,8 +13,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class AbstractApiResponseException extends Exception implements ApiResponseExceptionInterface
 {
     /**
-     * @param string $getMessage
-     * @param int $statusCode
      * @param array<Error>|null $errors
      */
     public function __construct(
