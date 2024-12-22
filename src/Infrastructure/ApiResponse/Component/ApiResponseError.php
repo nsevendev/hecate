@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Throwable;
 
-final class ApiResponseError
+final readonly class ApiResponseError
 {
     private function __construct(
         private int $statusCode,

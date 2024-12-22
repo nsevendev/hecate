@@ -18,7 +18,7 @@ enum ApiResponseStatusCodeExceptionType: int
     case PRECONDITION_FAILED = 412;
     case UNSUPPORTED_MEDIA_TYPE = 415;
     case UNPROCESSABLE_ENTITY = 422;
-    case Locked = 423;
+    case LOCKED = 423;
     case PRECONDITION_REQUIRED = 428;
     case TOO_MANY_REQUESTS = 429;
     case SERVICE_UNAVAILABLE = 503;

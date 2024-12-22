@@ -105,7 +105,7 @@ class ApiResponseFactory
      *
      * @param array<string, mixed> $headers
      */
-    public static function exceptionStatusCode(
+    public static function exceptionWithStatusCode(
         ApiResponseStatusCodeExceptionType $statusCode,
         ?string $message = null,
         string $challenge = 'Basic realm="Access to the staging site"',
