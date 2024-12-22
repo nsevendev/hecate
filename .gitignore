@@ -8,6 +8,8 @@
 /config/secrets/dev/dev.decrypt.private.php
 /config/secrets/test/test.decrypt.private.php
 /public/bundles/
+/public/coverage/*
+!/public/coverage/.gitkeep
 /var/*
 !var/log
 !var/cache
@@ -20,12 +22,11 @@
 
 ###> symfony/phpunit-bridge ###
 .phpunit.result.cache
-#/tests/phpunit.xml
 ###< symfony/phpunit-bridge ###
 
 ###> phpunit/phpunit ###
-#/tests/phpunit.xml
-.phpunit.result.cache
+phpunit.coverage.xml
+phpunit.report.xml
 ###< phpunit/phpunit ###
 
 ###> phpstan/phpstan ###
