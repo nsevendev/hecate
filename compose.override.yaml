@@ -22,3 +22,11 @@ services:
 
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###
+
+###> doctrine/doctrine-bundle ###
+  database:
+    ports:
+      - target: 5432
+        published: ${POSTGRES_PORT:-5432}
+        protocol: tcp
+###< doctrine/doctrine-bundle ###

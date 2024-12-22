@@ -1,5 +1,12 @@
+# find variable in .env.test file
+#ifneq (,$(wildcard .env.dev))
+ #  include .env.dev
+ #   export $(shell sed 's/=.*//' .env.dev)
+#endif
+
 # Executables (local)
 DOCKER_COMP = docker compose
+DOCKER_COMP_PROD = docker compose -f compose.yaml -f compose.prod.yaml
 
 # Docker containers
 PHP_CONT = $(DOCKER_COMP) exec php
@@ -8,24 +15,30 @@ PHP_CONT = $(DOCKER_COMP) exec php
 PHP      = $(PHP_CONT) php
 COMPOSER = $(PHP_CONT) composer
 SYMFONY  = $(PHP) bin/console
+SYMFONY_TEST  = $(PHP) bin/phpunit
+
+# Files env
+ENV_FILE_DEV = .env.dev.local
+ENV_FILE_PROD = .env.prod.local
 
 # Misc
 .DEFAULT_GOAL = help
-.PHONY        : help build up start down logs sh composer vendor sf cc test
+.PHONY        : help build up up-prod start start-prod down logs sh composer vendor sf cc test
 
 ## —— 🎵 🐳 The Symfony Docker Makefile 🐳 🎵 ——————————————————————————————————
 help: ## Outputs this help screen
 	@grep -E '(^[a-zA-Z0-9\./_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'
 
-## —— Docker 🐳 ————————————————————————————————————————————————————————————————
+## —— Docker dev 🐳 ————————————————————————————————————————————————————————————————
 build: ## Builds the Docker images
 	@$(DOCKER_COMP) build --pull --no-cache
 
-up: ## Start the docker hub in detached mode (no logs)
-	@$(DOCKER_COMP) up --detach
+up: ## Start the docker hub mode dev in detached mode (no logs)
+	@$(DOCKER_COMP) --env-file $(ENV_FILE_DEV) up --detach
 
-start: build up ## Build and start the containers
+start: build up ## Build and start the containers mode dev
 
+## —— Docker generic 🐳 ————————————————————————————————————————————————————————————————
 down: ## Stop the docker hub
 	@$(DOCKER_COMP) down --remove-orphans
 
@@ -42,7 +55,6 @@ test: ## Start tests with phpunit, pass the parameter "c=" to add options to php
 	@$(eval c ?=)
 	@$(DOCKER_COMP) exec -e APP_ENV=test php bin/phpunit $(c)
 
-
 ## —— Composer 🧙 ——————————————————————————————————————————————————————————————
 composer: ## Run composer, pass the parameter "c=" to run a given command, example: make composer c='req symfony/orm-pack'
 	@$(eval c ?=)
@@ -57,5 +69,23 @@ sf: ## List all Symfony commands or pass the parameter "c=" to run a given comma
 	@$(eval c ?=)
 	@$(SYMFONY) $(c)
 
+sf-test: ## List all Symfony commands or pass the parameter "c=" to run a given command, example: make sf c=about
+	@$(eval c ?=)
+	@$(SYMFONY_TEST) $(c)
+
 cc: c=c:c ## Clear the cache
 cc: sf
+
+## —— Docker prod 🐳 ————————————————————————————————————————————————————————————————
+up-prod: ## Start the docker hub mode prod in detached mode (no logs)
+	@$(DOCKER_COMP_PROD) --env-file $(ENV_FILE_PROD) up --detach
+
+start-prod: build up-prod ## Build and start the containers mode prod
+
+## —— Docker other 🐳 ————————————————————————————————————————————————————————————————
+create-test-db: ## Create the test database (NOT USE by default, use sqlite for tests in cache)
+	#@$(DOCKER_COMP) exec database sh -c 'psql -U "$(POSTGRES_USER)" -d postgres -c "CREATE DATABASE $(POSTGRES_DB)_test OWNER = $(POSTGRES_USER);"'
+
+sh-database: ## Connect to the database container
+	@$(DOCKER_COMP) exec database sh
+
