@@ -125,13 +125,20 @@ class ApiResponseFactoryTest extends HecateUnitTestCase
 
         $content = $response->getContent();
         self::assertIsString($content);
-        $responseData = json_decode($content, true);
 
+        $responseData = json_decode($content, true);
         self::assertIsArray($responseData);
+
         self::assertSame(500, $response->getStatusCode());
         self::assertSame('Test exception', $responseData['message']);
         self::assertSame(null, $responseData['data']);
         self::assertSame(null, $responseData['meta']);
         self::assertSame(null, $responseData['links']);
+
+        self::assertArrayHasKey('errors', $responseData);
+        self::assertIsArray($responseData['errors']);
+
+        $expectedError = ['key' => 'Test error', 'message' => 'test_error'];
+        self::assertContains($expectedError, $responseData['errors']);
     }
 }
