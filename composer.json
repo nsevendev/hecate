@@ -117,11 +117,11 @@
         ],
         "test": [
             "@putenv XDEBUG_MODE=off",
-            "paratest --configuration=tests/phpunit.xml --colors=always --testsuite default --testdox"
+            "APP_ENV=test paratest --configuration=tests/phpunit.xml --colors=always --testsuite default --testdox"
         ],
         "test:cover": [
             "@putenv XDEBUG_MODE=coverage",
-            "XDEBUG_MODE=coverage vendor/bin/phpunit tests --configuration=tests/phpunit.xml --colors=always --coverage-html public/coverage --coverage-clover phpunit.coverage.xml --log-junit phpunit.report.xml"
+            "APP_ENV=test XDEBUG_MODE=coverage vendor/bin/phpunit tests --configuration=tests/phpunit.xml --colors=always --coverage-html public/coverage --coverage-clover phpunit.coverage.xml --log-junit phpunit.report.xml"
         ]
     }
 }
