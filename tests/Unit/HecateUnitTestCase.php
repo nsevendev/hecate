@@ -34,14 +34,15 @@ abstract class HecateUnitTestCase extends TestCase
         );
 
         $connectionParams = $useMemory
-            ? ['driver' => 'pdo_sqlite', 'memory' => true] // In-memory SQLite
+            ? [
+                'driver' => 'pdo_sqlite',
+                'memory' => true,
+                'schema_manager_factory' => new DefaultSchemaManagerFactory(),
+            ] // In-memory SQLite
             : ['url' => $_ENV['DATABASE_URL']]; // Default connection from .env
 
         $connection = DriverManager::getConnection($connectionParams, $config);
 
-        $platform = $connection->getDatabasePlatform();
-        $platform->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        
         // Enregistrement du type personnalisé 'app_uid'
         if (false === Type::hasType('app_uid')) {
             Type::addType('app_uid', UidType::class);
