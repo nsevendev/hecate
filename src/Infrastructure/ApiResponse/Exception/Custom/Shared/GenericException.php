@@ -31,7 +31,7 @@ class GenericException extends AbstractApiResponseException
 
     protected function addErrorInfo(): void
     {
-        if ('dev' === $_ENV['APP_ENV']) {
+        if ('dev' === $_ENV['APP_ENV'] || 'test' === $_ENV['APP_ENV']) {
             $this->addError('file', $this->exception->getFile());
             $this->addError('line', (string) $this->exception->getLine());
             $this->addError('stack', $this->exception->getTraceAsString());

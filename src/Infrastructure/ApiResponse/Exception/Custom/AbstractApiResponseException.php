@@ -48,7 +48,7 @@ class AbstractApiResponseException extends Exception implements ApiResponseExcep
 
     protected function addErrorInfo(): void
     {
-        if ('dev' === $_ENV['APP_ENV']) {
+        if ('dev' === $_ENV['APP_ENV'] || 'test' === $_ENV['APP_ENV']) {
             $this->addError('file', $this->getFile());
             $this->addError('line', (string) $this->getLine());
             $this->addError('stack', $this->getTraceAsString());
