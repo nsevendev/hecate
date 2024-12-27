@@ -10,6 +10,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Throwable;
 
 class ApiResponseGenericExceptionListener
 {
@@ -34,7 +35,7 @@ class ApiResponseGenericExceptionListener
         $event->setResponse($response);
     }
 
-    private function handleGenericException(\Throwable $exception): JsonResponse
+    private function handleGenericException(Throwable $exception): JsonResponse
     {
         $statusCode = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : 500;
 
