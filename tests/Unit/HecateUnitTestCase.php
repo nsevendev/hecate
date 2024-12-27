@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 namespace Hecate\Tests\Unit;
 
+use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMSetup;
+use Hecate\Infrastructure\Doctrine\Type\UidType;
 use JsonException;
 use PHPUnit\Framework\TestCase;
 
@@ -11,6 +19,37 @@ use function json_encode;
 
 abstract class HecateUnitTestCase extends TestCase
 {
+    /**
+     * Creates an EntityManager for testing purposes.
+     *
+     * @param bool $useMemory whether to use an in-memory SQLite database
+     *
+     * @throws Exception
+     */
+    protected function createEntityManager(bool $useMemory = false): EntityManagerInterface
+    {
+        $config = ORMSetup::createAttributeMetadataConfiguration(
+            [__DIR__.'/../../src/Entity'], // Path to your entity files
+            true, // Enable development mode
+        );
+
+        $connectionParams = $useMemory
+            ? ['driver' => 'pdo_sqlite', 'memory' => true] // In-memory SQLite
+            : ['url' => $_ENV['DATABASE_URL']]; // Default connection from .env
+
+        $connection = DriverManager::getConnection($connectionParams, $config);
+
+        $platform = $connection->getDatabasePlatform();
+        $platform->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        
+        // Enregistrement du type personnalisé 'app_uid'
+        if (false === Type::hasType('app_uid')) {
+            Type::addType('app_uid', UidType::class);
+        }
+
+        return new EntityManager($connection, $config);
+    }
+
     /**
      * @param object $expectedObject object to be json encoded and compared with the result
      * @param string $actualJson     The json result you want to compare with the object to encode
