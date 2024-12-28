@@ -69,7 +69,7 @@ sf: ## List all Symfony commands or pass the parameter "c=" to run a given comma
 	@$(eval c ?=)
 	@$(SYMFONY) $(c)
 
-sf-test: ## List all Symfony commands or pass the parameter "c=" to run a given command, example: make sf c=about
+sf-test: ## List all Symfony commands or pass the parameter "c=" to run a given command, example: make sf-test c=about
 	@$(eval c ?=)
 	@$(SYMFONY_TEST) $(c)
 

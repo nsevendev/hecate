@@ -6,18 +6,17 @@ namespace Hecate\Infrastructure\ApiResponse;
 
 use Hecate\Infrastructure\ApiResponse\Component\ApiResponseData;
 use Hecate\Infrastructure\ApiResponse\Component\ApiResponseLink;
-use Hecate\Infrastructure\ApiResponse\Component\ApiResponseListError;
 use Hecate\Infrastructure\ApiResponse\Component\ApiResponseMessage;
 use Hecate\Infrastructure\ApiResponse\Component\ApiResponseMeta;
-use Hecate\Infrastructure\ApiResponse\Component\ApiResponseStatus;
+use Hecate\Infrastructure\ApiResponse\Exception\Error\ListError;
 
 final readonly class ApiResponse
 {
     public function __construct(
-        private ApiResponseStatus $apiResponseStatus,
+        private int $responseStatusCode,
         private ApiResponseMessage $apiResponseMessage,
         private ApiResponseData $apiResponseData,
-        private ApiResponseListError $apiResponseListError,
+        private ListError $listError,
         private ApiResponseLink $apiResponseLink = new ApiResponseLink(),
         private ApiResponseMeta $apiResponseMeta = new ApiResponseMeta(),
     ) {}
@@ -28,10 +27,10 @@ final readonly class ApiResponse
     public function toArray(): array
     {
         return [
-            'status' => $this->apiResponseStatus->status(),
+            'statusCode' => $this->responseStatusCode,
             'message' => $this->apiResponseMessage->message,
             'data' => $this->apiResponseData->data,
-            'errors' => $this->apiResponseListError->toArray(),
+            'errors' => $this->listError->toArray(),
             'meta' => $this->apiResponseMeta->listMetaData(),
             'links' => $this->apiResponseLink->listLinks(),
         ];

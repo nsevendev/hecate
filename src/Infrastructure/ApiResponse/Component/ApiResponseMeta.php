@@ -7,14 +7,14 @@ namespace Hecate\Infrastructure\ApiResponse\Component;
 final readonly class ApiResponseMeta
 {
     /**
-     * @param array<string, mixed> $listMetaData
+     * @param array<string, mixed>|null $listMetaData
      */
-    public function __construct(private array $listMetaData = []) {}
+    public function __construct(private ?array $listMetaData = null) {}
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, mixed>|null
      */
-    public function listMetaData(): array
+    public function listMetaData(): ?array
     {
         return $this->listMetaData;
     }

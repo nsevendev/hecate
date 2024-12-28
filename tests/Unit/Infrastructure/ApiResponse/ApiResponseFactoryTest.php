@@ -7,26 +7,23 @@ namespace Hecate\Tests\Unit\Infrastructure\ApiResponse;
 use Hecate\Infrastructure\ApiResponse\ApiResponse;
 use Hecate\Infrastructure\ApiResponse\ApiResponseFactory;
 use Hecate\Infrastructure\ApiResponse\Component\ApiResponseData;
-use Hecate\Infrastructure\ApiResponse\Component\ApiResponseError;
 use Hecate\Infrastructure\ApiResponse\Component\ApiResponseLink;
-use Hecate\Infrastructure\ApiResponse\Component\ApiResponseListError;
 use Hecate\Infrastructure\ApiResponse\Component\ApiResponseMessage;
 use Hecate\Infrastructure\ApiResponse\Component\ApiResponseMeta;
-use Hecate\Infrastructure\ApiResponse\Component\ApiResponseStatus;
-use Hecate\Infrastructure\ApiResponse\Type\ApiResponseStatusCodeExceptionType;
+use Hecate\Infrastructure\ApiResponse\Exception\Error\Error;
+use Hecate\Infrastructure\ApiResponse\Exception\Error\ListError;
 use Hecate\Tests\Unit\HecateUnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[
     CoversClass(ApiResponseFactory::class),
     CoversClass(ApiResponse::class),
-    CoversClass(ApiResponseError::class),
     CoversClass(ApiResponseLink::class),
     CoversClass(ApiResponseMeta::class),
     CoversClass(ApiResponseData::class),
-    CoversClass(ApiResponseListError::class),
     CoversClass(ApiResponseMessage::class),
-    CoversClass(ApiResponseStatus::class)
+    CoversClass(ListError::class),
+    CoversClass(Error::class),
 ]
 class ApiResponseFactoryTest extends HecateUnitTestCase
 {
@@ -66,6 +63,7 @@ class ApiResponseFactoryTest extends HecateUnitTestCase
         self::assertSame('Test success', $responseData['message']);
         self::assertSame($this->data, $responseData['data']);
         self::assertSame($this->meta, $responseData['meta']);
+        self::assertSame(null, $responseData['errors']);
         self::assertSame($this->links, $responseData['links']);
     }
 
@@ -82,6 +80,7 @@ class ApiResponseFactoryTest extends HecateUnitTestCase
         self::assertIsArray($responseData);
         self::assertSame(201, $response->getStatusCode());
         self::assertSame('Resource created', $responseData['message']);
+        self::assertSame(null, $responseData['errors']);
         self::assertSame($this->data, $responseData['data']);
     }
 
@@ -98,6 +97,7 @@ class ApiResponseFactoryTest extends HecateUnitTestCase
         self::assertIsArray($responseData);
         self::assertSame(202, $response->getStatusCode());
         self::assertSame('Request accepted', $responseData['message']);
+        self::assertSame(null, $responseData['errors']);
         self::assertSame($this->data, $responseData['data']);
     }
 
@@ -112,28 +112,15 @@ class ApiResponseFactoryTest extends HecateUnitTestCase
         self::assertIsArray($responseData);
         self::assertSame(204, $response->getStatusCode());
         self::assertSame('No Content', $responseData['message']);
+        self::assertSame(null, $responseData['errors']);
     }
 
-    public function testExceptionWithStatusCodeApiResponse400(): void
+    public function testToExceptionApiResponse(): void
     {
-        $response = ApiResponseFactory::exceptionWithStatusCode(
-            statusCode: ApiResponseStatusCodeExceptionType::BAD_REQUEST,
-            message: 'Test exception 400'
-        );
-
-        $content = $response->getContent();
-        self::assertIsString($content);
-        $responseData = json_decode($content, true);
-
-        self::assertIsArray($responseData);
-        self::assertSame(400, $response->getStatusCode());
-        self::assertSame('Test exception 400', $responseData['message']);
-    }
-
-    public function testExceptionThrowableApiResponse(): void
-    {
-        $response = ApiResponseFactory::exceptionThrowable(
-            exception: new \RuntimeException('Test exception 500')
+        $response = ApiResponseFactory::toException(
+            statusCode: 500,
+            message: 'Test exception',
+            errors: [Error::create('Test error', 'test_error')],
         );
 
         $content = $response->getContent();
@@ -142,6 +129,9 @@ class ApiResponseFactoryTest extends HecateUnitTestCase
 
         self::assertIsArray($responseData);
         self::assertSame(500, $response->getStatusCode());
-        self::assertSame('Test exception 500', $responseData['message']);
+        self::assertSame('Test exception', $responseData['message']);
+        self::assertSame(null, $responseData['data']);
+        self::assertSame(null, $responseData['meta']);
+        self::assertSame(null, $responseData['links']);
     }
 }
