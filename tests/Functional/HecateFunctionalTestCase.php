@@ -67,13 +67,13 @@ abstract class HecateFunctionalTestCase extends WebTestCase
 
     protected function getEntityManager(): EntityManagerInterface
     {
-        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
 
-        if (!$em instanceof EntityManagerInterface) {
+        if (!$entityManager instanceof EntityManagerInterface) {
             throw new RuntimeException('HecateEntityManagerInterface not found in container.');
         }
 
-        return $em;
+        return $entityManager;
     }
 
     private function getRegistry(): ManagerRegistry
