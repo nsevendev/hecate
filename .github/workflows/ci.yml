@@ -54,7 +54,10 @@ jobs:
             echo "Waiting for database...";
             sleep 5;
           done
-
+          
+      - name: Run Create database test
+        run: docker compose exec php composer migration-bdd-test
+        
       - name: Run Composer Check
         run: docker compose exec php composer check
 
