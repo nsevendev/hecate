@@ -22,24 +22,20 @@ abstract class HecateUnitTestCase extends TestCase
     /**
      * Creates an EntityManager for testing purposes.
      *
-     * @param bool $useMemory whether to use an in-memory SQLite database
-     *
      * @throws Exception
      */
-    protected function createEntityManager(bool $useMemory = false): EntityManagerInterface
+    protected function createEntityManagerAndUseMemory(): EntityManagerInterface
     {
         $config = ORMSetup::createAttributeMetadataConfiguration(
             [__DIR__.'/../../src/Entity'], // Path to your entity files
             true, // Enable development mode
         );
 
-        $connectionParams = $useMemory
-            ? [
-                'driver' => 'pdo_sqlite',
-                'memory' => true,
-                'schema_manager_factory' => new DefaultSchemaManagerFactory(),
-            ] // In-memory SQLite
-            : ['url' => $_ENV['DATABASE_URL']]; // Default connection from .env
+        $connectionParams = [
+            'driver' => 'pdo_sqlite',
+            'memory' => true,
+            'schema_manager_factory' => new DefaultSchemaManagerFactory(),
+        ];
 
         $connection = DriverManager::getConnection($connectionParams, $config);
 
