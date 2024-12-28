@@ -107,8 +107,14 @@
             "@putenv XDEBUG_MODE=off",
             "php-cs-fixer fix --config=qa/.php-cs-fixer.dist.php"
         ],
+        "migration-bdd-test": [
+            "@putenv XDEBUG_MODE=off",
+            "APP_ENV=test php bin/console doctrine:database:drop --if-exists --force --env=test",
+            "APP_ENV=test php bin/console doctrine:database:create --env=test",
+            "APP_ENV=test php bin/console doctrine:migrations:migrate --no-interaction --env=test"
+        ],
         "nz": [
-            "composer normalize"
+            "composer normalize --no-update-lock"
         ],
         "ps": [
             "@putenv XDEBUG_MODE=off",

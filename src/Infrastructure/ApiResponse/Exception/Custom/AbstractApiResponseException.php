@@ -21,6 +21,8 @@ class AbstractApiResponseException extends Exception implements ApiResponseExcep
         protected $errors = null,
     ) {
         parent::__construct($getMessage, $statusCode, null);
+
+        $this->errors[] = Error::create('error', $this->getMessage());
     }
 
     public function getStatusCode(): int
@@ -30,10 +32,26 @@ class AbstractApiResponseException extends Exception implements ApiResponseExcep
 
     public function toApiResponse(): JsonResponse
     {
+        $this->addErrorInfo();
+
         return ApiResponseFactory::toException(
             statusCode: $this->statusCode,
             message: $this->getMessage,
             errors: $this->errors,
         );
+    }
+
+    protected function addError(string $key, string $message): void
+    {
+        $this->errors[] = Error::create($key, $message);
+    }
+
+    protected function addErrorInfo(): void
+    {
+        if ('dev' === $_ENV['APP_ENV'] || 'test' === $_ENV['APP_ENV']) {
+            $this->addError('file', $this->getFile());
+            $this->addError('line', (string) $this->getLine());
+            $this->addError('stack', $this->getTraceAsString());
+        }
     }
 }
