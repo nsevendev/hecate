@@ -25,13 +25,13 @@ class PingEntityDatabaseTest extends HecateUnitTestCase
      */
     protected function setUp(): void
     {
-        $this->entityManager = $this->createEntityManager(true);
+        $this->entityManager = $this->createEntityManagerAndUseMemory();
 
         // Générer le schéma en mémoire
         $schemaTool = new SchemaTool($this->entityManager);
-        $schemaTool->createSchema(
-            $this->entityManager->getMetadataFactory()->getAllMetadata()
-        );
+        $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
+        $schemaTool->dropSchema($metadata);
+        $schemaTool->createSchema($metadata);
     }
 
     /**
