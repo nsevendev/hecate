@@ -21,7 +21,7 @@ jobs:
       HTTPS_PORT: 65009
       HTTP3_PORT: 65010
       POSTGRES_PORT: 53933
-      DATABASE_URL: "postgresql://heacte:hecate@database:5432/hecate?serverVersion=16&charset=utf8"
+      DATABASE_URL: "postgresql://heacte:hecate@database:5432/hecate_test?serverVersion=16&charset=utf8"
       POSTGRES_VERSION: 16
       POSTGRES_DB: hecate
       POSTGRES_USER: hecate
@@ -54,7 +54,10 @@ jobs:
             echo "Waiting for database...";
             sleep 5;
           done
-
+          
+      - name: Run Create database test
+        run: docker compose exec php composer migration-bdd-test
+        
       - name: Run Composer Check
         run: docker compose exec php composer check
 
