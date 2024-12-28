@@ -1,7 +1,7 @@
-# find variable in .env.test file
+#find variable in .env.dev file
 #ifneq (,$(wildcard .env.dev))
- #  include .env.dev
- #   export $(shell sed 's/=.*//' .env.dev)
+#   include .env.dev
+#   export $(shell sed 's/=.*//' .env.dev)
 #endif
 
 # Executables (local)
@@ -51,9 +51,16 @@ sh: ## Connect to the FrankenPHP container
 bash: ## Connect to the FrankenPHP container via bash so up and down arrows go to previous commands
 	@$(PHP_CONT) bash
 
-test: ## Start tests with phpunit, pass the parameter "c=" to add options to phpunit, example: make test c="--group e2e --stop-on-failure"
+test: ## Start tests with paratest, pass the parameter "c=" to add options, example: make test c="tests/Unit"
 	@$(eval c ?=)
-	@$(DOCKER_COMP) exec -e APP_ENV=test php bin/phpunit $(c)
+	@$(COMPOSER) test $(c)
+
+test-cover: ## Start tests with paratest with coverage, pass the parameter "c=" to add options to command, example: make test-cover c="--stop-on-failure"
+	@$(eval c ?=)
+	@$(COMPOSER) test:cover $(c)
+
+check: ## Start all process to check code quality, cs, phpstan, les tests, et normalise le fichier composer.json
+	@$(COMPOSER) check
 
 ## —— Composer 🧙 ——————————————————————————————————————————————————————————————
 composer: ## Run composer, pass the parameter "c=" to run a given command, example: make composer c='req symfony/orm-pack'
@@ -94,3 +101,5 @@ create-test-db: ## Create the test database (NOT USE by default, use sqlite for 
 sh-database: ## Connect to the database container
 	@$(DOCKER_COMP) exec database sh
 
+m-bdd: ## drop and create database for tests
+	@$(COMPOSER) migration-bdd-test
