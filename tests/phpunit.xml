@@ -12,6 +12,12 @@
          failOnPhpunitDeprecation="true"
          failOnRisky="true"
          failOnWarning="true">
+
+    <php>
+        <env name="APP_ENV" value="test"/>
+        <env name="KERNEL_CLASS" value="Hecate\Kernel" />
+    </php>
+
     <testsuites>
         <testsuite name="default">
             <directory>./</directory>

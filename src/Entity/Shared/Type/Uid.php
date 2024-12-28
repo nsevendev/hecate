@@ -21,8 +21,6 @@ abstract class Uid implements Stringable, JsonSerializable
 
     public const string REGEX_LEGACY_UUID = '^[a-z0-9]{31}$';
 
-    public const string REGEX_LEGACY_VTF = '^VTF_[a-z0-9]{13}$'; // Utilisé dans les ParcoursSouscription
-
     final private function __construct(private readonly string $uid) {}
 
     final public static function create(): static
@@ -44,10 +42,6 @@ abstract class Uid implements Stringable, JsonSerializable
         }
 
         if (preg_match('@'.self::REGEX_LEGACY_UUID.'@', $id)) {
-            return new static($id);
-        }
-
-        if (preg_match('@'.self::REGEX_LEGACY_VTF.'@', $id)) {
             return new static($id);
         }
 
