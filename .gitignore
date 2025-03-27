@@ -1,39 +1,6 @@
 .idea
-.github/workflows/.secrets
-###> symfony/framework-bundle ###
-/.env.local
-/.env.local.php
-/.env.*.local
-/config/secrets/prod/prod.decrypt.private.php
-/config/secrets/dev/dev.decrypt.private.php
-/config/secrets/test/test.decrypt.private.php
-/public/bundles/
-/public/coverage/*
-!/public/coverage/.gitkeep
-/var/*
-!var/log
-!var/cache
-/var/log/*
-/var/cache/*
-!var/log/.gitkeep
-!var/cache/.gitkeep
-/vendor/
-###< symfony/framework-bundle ###
 
-###> symfony/phpunit-bridge ###
-.phpunit.result.cache
-###< symfony/phpunit-bridge ###
+.env
 
-###> phpunit/phpunit ###
-phpunit.coverage.xml
-phpunit.report.xml
-###< phpunit/phpunit ###
-
-###> phpstan/phpstan ###
-phpstan.neon
-###< phpstan/phpstan ###
-
-###> friendsofphp/php-cs-fixer ###
-/.php-cs-fixer.php
-/.php-cs-fixer.cache
-###< friendsofphp/php-cs-fixer ###
+runtime/*
+!runtime/.gitkeep
